@@ -48,12 +48,12 @@
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
         }
-        /* Forzar visibilidad absoluta de las pestañas activas */
-        .tab-content {
-            display: none;
+        /* Control estricto de pestañas */
+        .tab-pane {
+            display: none !important;
         }
-        .tab-content.active {
-            display: block;
+        .tab-pane.active-pane {
+            display: block !important;
         }
     </style>
 </head>
@@ -138,7 +138,7 @@
     <main class="max-w-7xl mx-auto px-4 py-6 flex-grow w-full">
 
         <!-- TAB 1: PLANTILLA / ROSTER -->
-        <section id="view-roster" class="tab-content active space-y-6">
+        <section id="view-roster" class="tab-pane active-pane space-y-6">
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-slate-900/60 p-4 rounded-2xl border border-slate-800">
                 <div>
                     <h2 class="text-lg font-black text-white flex items-center gap-2">
@@ -158,7 +158,7 @@
         </section>
 
         <!-- TAB 2: PARTIDOS & ASISTENCIA -->
-        <section id="view-matches" class="tab-content space-y-6">
+        <section id="view-matches" class="tab-pane space-y-6">
             <div class="flex justify-between items-center bg-slate-900/60 p-4 rounded-2xl border border-slate-800">
                 <div>
                     <h2 class="text-lg font-black text-white">Calendario de Partidos</h2>
@@ -172,7 +172,7 @@
         </section>
 
         <!-- TAB 3: VALORACIONES & STATS -->
-        <section id="view-ratings" class="tab-content space-y-6">
+        <section id="view-ratings" class="tab-pane space-y-6">
             <div class="bg-slate-900/60 p-4 rounded-2xl border border-slate-800">
                 <h2 class="text-lg font-black text-white">Tabla de Valoraciones y Estadísticas Acumuladas</h2>
                 <p class="text-xs text-slate-400">Escala de 1 a 10 basada en desempeño en partidos asistidos</p>
@@ -200,7 +200,7 @@
         </section>
 
         <!-- TAB 4: PIZARRA TÁCTICA 2-3 -->
-        <section id="view-tactics" class="tab-content space-y-6">
+        <section id="view-tactics" class="tab-pane space-y-6">
             <div class="bg-slate-900/60 p-4 rounded-2xl border border-slate-800 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
                     <h2 class="text-lg font-black text-white">Formación Táctica 2-3 (Quinteto Titular)</h2>
@@ -245,7 +245,7 @@
         </section>
 
         <!-- TAB 5: REGISTRO DE JUGADORES -->
-        <section id="view-register" class="tab-content space-y-6 max-w-2xl mx-auto">
+        <section id="view-register" class="tab-pane space-y-6 max-w-2xl mx-auto">
             <div id="invite-banner" class="hidden bg-gradient-to-r from-orange-600 to-amber-600 p-4 rounded-2xl text-white shadow-xl flex items-center gap-3">
                 <i class="fa-solid fa-envelope-open-text text-2xl"></i>
                 <div>
@@ -519,9 +519,9 @@
             populateTacticalSelects();
         }
 
-        // SISTEMA DE CAMBIO DE PESTAÑAS BASADO EN CLASE .ACTIVE
+        // SISTEMA DE CAMBIO DE PESTAÑAS BLINDADO
         function switchTab(tabId) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-pane').forEach(el => el.classList.remove('active-pane'));
             document.querySelectorAll('.tab-btn').forEach(btn => {
                 btn.className = 'tab-btn px-4 py-3 text-slate-400 hover:text-slate-200 flex items-center gap-2 whitespace-nowrap transition-colors';
             });
@@ -529,7 +529,7 @@
             const activeView = document.getElementById(`view-${tabId}`);
             const activeTabBtn = document.getElementById(`tab-${tabId}`);
             
-            if (activeView) activeView.classList.add('active');
+            if (activeView) activeView.classList.add('active-pane');
             if (activeTabBtn) {
                 activeTabBtn.className = 'tab-btn px-4 py-3 text-orange-400 border-b-2 border-orange-500 flex items-center gap-2 whitespace-nowrap transition-colors';
             }
@@ -548,185 +548,4 @@
             select.innerHTML = '';
 
             if (players.length === 0) {
-                select.innerHTML = '<option value="">Sin jugadores</option>';
-                if (avatar) avatar.src = "https://placehold.co/100x100/1e293b/f97316?text=User";
-                return;
-            }
-
-            if (!activePlayerId || !players.some(p => p.id === activePlayerId)) {
-                activePlayerId = players[0].id;
-                localStorage.setItem('onecoin_active_player', activePlayerId);
-            }
-
-            players.forEach(p => {
-                const opt = document.createElement('option');
-                opt.value = p.id;
-                opt.textContent = `${p.name} (#${p.number})`;
-                if (p.id === activePlayerId) {
-                    opt.selected = true;
-                    if (avatar) avatar.src = p.photo;
-                }
-                select.appendChild(opt);
-            });
-        }
-
-        function openInviteModal() {
-            const modal = document.getElementById('invite-modal');
-            const input = document.getElementById('invite-url-input');
-            if (modal && input) {
-                input.value = getInviteUrl();
-                modal.classList.remove('hidden');
-            }
-        }
-
-        function closeInviteModal() {
-            document.getElementById('invite-modal').classList.add('hidden');
-        }
-
-        function getInviteUrl() {
-            let base = window.location.href.split('#')[0].split('?')[0];
-            return `${base}?invite=true#register`;
-        }
-
-        function copyInviteLink() {
-            const input = document.getElementById('invite-url-input');
-            if (!input) return;
-            input.select();
-            document.execCommand('copy');
-            alert('¡Enlace de invitación copiado!');
-        }
-
-        function shareWhatsAppInvite() {
-            const url = getInviteUrl();
-            const text = encodeURIComponent(`🏀 ¡Únete al equipo oficial de One Coin Basketball! Registra tu ficha de jugador aquí:\n${url}`);
-            window.open(`https://api.whatsapp.com/send?text=${text}`, '_blank');
-        }
-
-        function checkInviteLinkAndDirect() {
-            const href = String(window.location.href).toLowerCase();
-            if (href.includes('invite') || href.includes('register')) {
-                switchTab('register');
-                const banner = document.getElementById('invite-banner');
-                if (banner) banner.classList.remove('hidden');
-            }
-        }
-
-        function handleImageUpload(event, previewId, urlInputId) {
-            const file = event.target.files && event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const prev = document.getElementById(previewId);
-                    if (prev) prev.src = e.target.result;
-                    if (urlInputId) document.getElementById(urlInputId).value = e.target.result;
-                };
-                reader.readAsDataURL(file);
-            }
-        }
-
-        function handlePlayerSubmit(event) {
-            event.preventDefault();
-            const name = document.getElementById('reg-name').value.trim();
-            const position = document.getElementById('reg-position').value;
-            const number = parseInt(document.getElementById('reg-number').value);
-            const height = document.getElementById('reg-height').value.trim() || '1.80m';
-            const phone = document.getElementById('reg-phone').value.trim() || 'N/A';
-            const photoUrl = document.getElementById('reg-photo-url').value.trim() || 'https://placehold.co/300x300/1e293b/f97316?text=' + encodeURIComponent(name);
-
-            if (players.some(p => p.number === number)) {
-                alert(`El jersey #${number} ya pertenece a otro jugador.`);
-                return;
-            }
-
-            const newPlayer = { id: 'p_' + Date.now(), name, position, number, height, phone, photo: photoUrl };
-            players.push(newPlayer);
-            activePlayerId = newPlayer.id;
-            localStorage.setItem('onecoin_active_player', activePlayerId);
-
-            saveState();
-            renderAllViews();
-            document.getElementById('form-register-player').reset();
-            alert(`¡Bienvenido a One Coin, ${name}! Ahora estás seleccionado como tu usuario activo.`);
-            switchTab('roster');
-        }
-
-        function filterPosition(pos) {
-            currentPosFilter = pos;
-            document.querySelectorAll('.pos-filter-btn').forEach(btn => {
-                if (btn.textContent.includes(pos) || (pos === 'All' && btn.textContent === 'Todos')) {
-                    btn.className = 'pos-filter-btn px-3 py-1.5 rounded-lg bg-orange-600 text-white font-bold text-xs shadow-md';
-                } else {
-                    btn.className = 'pos-filter-btn px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 border border-slate-700 text-xs hover:border-slate-500';
-                }
-            });
-            renderRoster();
-        }
-
-        function renderRoster() {
-            const grid = document.getElementById('roster-grid');
-            const countBadge = document.getElementById('player-count-badge');
-            if (!grid) return;
-            grid.innerHTML = '';
-
-            const filtered = currentPosFilter === 'All' ? players : players.filter(p => p.position === currentPosFilter);
-            if (countBadge) countBadge.textContent = players.length;
-
-            if (filtered.length === 0) {
-                grid.innerHTML = '<div class="col-span-full text-center text-slate-500 py-8 text-sm">No hay jugadores registrados aún. Invita a tus compañeros desde el botón superior.</div>';
-                return;
-            }
-
-            filtered.forEach(p => {
-                const stats = getAccumulatedPlayerStats(p.id);
-                const isMe = p.id === activePlayerId;
-                const card = document.createElement('div');
-                card.className = `glass-panel p-4 rounded-2xl border ${isMe ? 'border-orange-500 shadow-orange-500/10' : 'border-slate-800'} flex flex-col justify-between space-y-4 hover:border-orange-500/50 transition shadow-lg relative`;
-                
-                card.innerHTML = `
-                    ${isMe ? '<span class="absolute top-3 right-3 bg-orange-500 text-white text-[10px] font-black px-2 py-0.5 rounded-full shadow">Tú</span>' : ''}
-                    <div class="flex items-start space-x-3">
-                        <img src="${p.photo}" onerror="this.src='https://placehold.co/100x100/1e293b/f97316?text=Foto'" class="w-16 h-16 rounded-2xl object-cover border border-slate-700 shadow-md">
-                        <div class="flex-grow">
-                            <div class="flex items-center justify-between">
-                                <span class="bg-orange-500/20 text-orange-400 font-black text-xs px-2 py-0.5 rounded border border-orange-500/30">#${p.number}</span>
-                                <span class="text-xs text-slate-400 font-semibold">${p.position}</span>
-                            </div>
-                            <h3 class="font-bold text-white text-base mt-1 line-clamp-1">${p.name}</h3>
-                            <p class="text-xs text-slate-400">📏 ${p.height}</p>
-                        </div>
-                    </div>
-                    <div class="grid grid-cols-3 gap-1 bg-slate-900/60 p-2 rounded-xl text-center text-[10px] border border-slate-800/80">
-                        <div><span class="text-slate-500 block uppercase">PPP</span><span class="font-bold text-slate-200">${stats.ppp}</span></div>
-                        <div><span class="text-slate-500 block uppercase">TPP</span><span class="font-bold text-slate-200">${stats.tpp}</span></div>
-                        <div><span class="text-slate-500 block uppercase">APP</span><span class="font-bold text-slate-200">${stats.app}</span></div>
-                    </div>
-                    <button type="button" onclick="openPlayerCardModal('${p.id}')" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs py-2 rounded-xl font-bold border border-slate-700 transition flex items-center justify-center gap-1.5">
-                        <i class="fa-solid fa-id-card text-orange-400"></i> Ver Tarjeta & Perfil
-                    </button>
-                `;
-                grid.appendChild(card);
-            });
-        }
-
-        function getAccumulatedPlayerStats(playerId) {
-            let matchesPlayed = 0, pts = 0, blk = 0, ast = 0;
-            matches.forEach(m => {
-                if (m.finished && m.playerStats && m.playerStats[playerId]) {
-                    matchesPlayed++;
-                    pts += parseInt(m.playerStats[playerId].pts || 0);
-                    blk += parseInt(m.playerStats[playerId].blk || 0);
-                    ast += parseInt(m.playerStats[playerId].ast || 0);
-                }
-            });
-            return {
-                matchesPlayed, pts, blk, ast,
-                ppp: matchesPlayed > 0 ? (pts / matchesPlayed).toFixed(1) : "0.0",
-                tpp: matchesPlayed > 0 ? (blk / matchesPlayed).toFixed(1) : "0.0",
-                app: matchesPlayed > 0 ? (ast / matchesPlayed).toFixed(1) : "0.0"
-            };
-        }
-
-        function openPlayerCardModal(playerId) {
-            const p = players.find(x => x.id === playerId);
-            if (!p) return;
-            const stats = getAccum
+                select.innerHTML = '<option value="">
