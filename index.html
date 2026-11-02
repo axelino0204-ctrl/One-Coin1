@@ -67,7 +67,7 @@
                 </div>
             </div>
 
-            <!-- Active User Profile / Switcher & Cloud Indicator -->
+            <!-- Active User Profile & Cloud Indicator -->
             <div class="flex items-center gap-3">
                 <div id="syncStatus" class="flex items-center gap-1.5 bg-amber-500/10 text-amber-400 border border-amber-500/20 px-2.5 py-1 rounded-full text-xs font-bold">
                     <i class="fa-solid fa-cloud-arrow-up animate-pulse"></i>
@@ -86,19 +86,19 @@
 
         <!-- NAVIGATION TABS -->
         <nav class="flex border-t border-slate-800/80 max-w-7xl mx-auto px-4 overflow-x-auto scrollbar-none text-xs font-bold">
-            <button onclick="switchTab('roster')" id="tab-roster" class="tab-btn px-4 py-3 text-orange-400 border-b-2 border-orange-500 flex items-center gap-2 whitespace-nowrap">
+            <button onclick="switchTab('roster')" id="tab-roster" class="tab-btn px-4 py-3 text-orange-400 border-b-2 border-orange-500 flex items-center gap-2 whitespace-nowrap transition-colors">
                 <i class="fa-solid fa-users"></i> Plantilla (Roster)
             </button>
-            <button onclick="switchTab('matches')" id="tab-matches" class="tab-btn px-4 py-3 text-slate-400 hover:text-slate-200 flex items-center gap-2 whitespace-nowrap">
+            <button onclick="switchTab('matches')" id="tab-matches" class="tab-btn px-4 py-3 text-slate-400 hover:text-slate-200 flex items-center gap-2 whitespace-nowrap transition-colors">
                 <i class="fa-solid fa-calendar-days"></i> Partidos & Asistencia
             </button>
-            <button onclick="switchTab('ratings')" id="tab-ratings" class="tab-btn px-4 py-3 text-slate-400 hover:text-slate-200 flex items-center gap-2 whitespace-nowrap">
+            <button onclick="switchTab('ratings')" id="tab-ratings" class="tab-btn px-4 py-3 text-slate-400 hover:text-slate-200 flex items-center gap-2 whitespace-nowrap transition-colors">
                 <i class="fa-solid fa-star"></i> Valoraciones & Stats (1-10)
             </button>
-            <button onclick="switchTab('tactics')" id="tab-tactics" class="tab-btn px-4 py-3 text-slate-400 hover:text-slate-200 flex items-center gap-2 whitespace-nowrap">
+            <button onclick="switchTab('tactics')" id="tab-tactics" class="tab-btn px-4 py-3 text-slate-400 hover:text-slate-200 flex items-center gap-2 whitespace-nowrap transition-colors">
                 <i class="fa-solid fa-chess-board"></i> Pizarra Táctica (2-3)
             </button>
-            <button onclick="switchTab('register')" id="tab-register" class="tab-btn px-4 py-3 text-slate-400 hover:text-slate-200 flex items-center gap-2 whitespace-nowrap">
+            <button onclick="switchTab('register')" id="tab-register" class="tab-btn px-4 py-3 text-slate-400 hover:text-slate-200 flex items-center gap-2 whitespace-nowrap transition-colors">
                 <i class="fa-solid fa-user-plus"></i> Registro
             </button>
         </nav>
@@ -149,9 +149,7 @@
             </div>
 
             <!-- Roster Grid -->
-            <div id="roster-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                <!-- Dynamic Player Cards -->
-            </div>
+            <div id="roster-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"></div>
         </section>
 
         <!-- TAB 2: PARTIDOS & ASISTENCIA -->
@@ -166,9 +164,7 @@
                 </button>
             </div>
 
-            <div id="matches-list" class="space-y-4">
-                <!-- Dynamic Matches -->
-            </div>
+            <div id="matches-list" class="space-y-4"></div>
         </section>
 
         <!-- TAB 3: VALORACIONES & STATS -->
@@ -195,9 +191,7 @@
                             <th class="p-3 text-center">Promedio</th>
                         </tr>
                     </thead>
-                    <tbody id="ratings-table-body" class="divide-y divide-slate-800/50">
-                        <!-- Dynamic Rating Rows -->
-                    </tbody>
+                    <tbody id="ratings-table-body" class="divide-y divide-slate-800/50"></tbody>
                 </table>
             </div>
         </section>
@@ -216,224 +210,30 @@
 
             <!-- Court Visualizer -->
             <div class="court-bg border border-slate-700 rounded-3xl p-6 min-h-[460px] relative flex flex-col justify-between shadow-2xl">
-                
-                <!-- TOP 3 PERIMETER (Centro, Ala 1, Ala 2) -->
                 <div class="grid grid-cols-3 gap-4 text-center z-10 pt-2">
-                    <!-- Ala 1 -->
                     <div class="flex flex-col items-center">
                         <span class="text-[10px] font-extrabold text-orange-400 bg-slate-900/90 px-2 py-0.5 rounded border border-orange-500/30 uppercase mb-1">Ala 1 (Perímetro)</span>
-                        <select id="select-ala1" class="bg-slate-900 text-slate-200 text-xs font-bold p-2 rounded-xl border border-slate-700 w-full max-w-[160px] text-center shadow-lg focus:border-orange-500">
-                            <!-- Options -->
-                        </select>
+                        <select id="select-ala1" class="bg-slate-900 text-slate-200 text-xs font-bold p-2 rounded-xl border border-slate-700 w-full max-w-[160px] text-center shadow-lg focus:border-orange-500"></select>
                     </div>
-                    <!-- Centro / Base -->
                     <div class="flex flex-col items-center">
                         <span class="text-[10px] font-extrabold text-amber-400 bg-slate-900/90 px-2 py-0.5 rounded border border-amber-500/30 uppercase mb-1">Centro / Organizador</span>
-                        <select id="select-centro" class="bg-slate-900 text-slate-200 text-xs font-bold p-2 rounded-xl border border-slate-700 w-full max-w-[160px] text-center shadow-lg focus:border-orange-500">
-                            <!-- Options -->
-                        </select>
+                        <select id="select-centro" class="bg-slate-900 text-slate-200 text-xs font-bold p-2 rounded-xl border border-slate-700 w-full max-w-[160px] text-center shadow-lg focus:border-orange-500"></select>
                     </div>
-                    <!-- Ala 2 -->
                     <div class="flex flex-col items-center">
                         <span class="text-[10px] font-extrabold text-orange-400 bg-slate-900/90 px-2 py-0.5 rounded border border-orange-500/30 uppercase mb-1">Ala 2 (Perímetro)</span>
-                        <select id="select-ala2" class="bg-slate-900 text-slate-200 text-xs font-bold p-2 rounded-xl border border-slate-700 w-full max-w-[160px] text-center shadow-lg focus:border-orange-500">
-                            <!-- Options -->
-                        </select>
+                        <select id="select-ala2" class="bg-slate-900 text-slate-200 text-xs font-bold p-2 rounded-xl border border-slate-700 w-full max-w-[160px] text-center shadow-lg focus:border-orange-500"></select>
                     </div>
                 </div>
 
-                <!-- KEY PAINT AREA (Decorative Rim) -->
                 <div class="self-center my-6 border-2 border-slate-600/50 w-48 h-32 rounded-b-3xl relative flex items-center justify-center bg-orange-500/5">
                     <div class="w-12 h-12 rounded-full border border-orange-500/40"></div>
                 </div>
 
-                <!-- BOTTOM 2 INSIDE (Poste 1, Poste 2) -->
                 <div class="grid grid-cols-2 gap-12 text-center z-10 pb-2 max-w-lg mx-auto w-full">
-                    <!-- Poste 1 -->
                     <div class="flex flex-col items-center">
                         <span class="text-[10px] font-extrabold text-emerald-400 bg-slate-900/90 px-2 py-0.5 rounded border border-emerald-500/30 uppercase mb-1">Poste 1 (Interior)</span>
-                        <select id="select-poste1" class="bg-slate-900 text-slate-200 text-xs font-bold p-2 rounded-xl border border-slate-700 w-full text-center shadow-lg focus:border-orange-500">
-                            <!-- Options -->
-                        </select>
+                        <select id="select-poste1" class="bg-slate-900 text-slate-200 text-xs font-bold p-2 rounded-xl border border-slate-700 w-full text-center shadow-lg focus:border-orange-500"></select>
                     </div>
-                    <!-- Poste 2 -->
                     <div class="flex flex-col items-center">
                         <span class="text-[10px] font-extrabold text-emerald-400 bg-slate-900/90 px-2 py-0.5 rounded border border-emerald-500/30 uppercase mb-1">Poste 2 (Interior)</span>
-                        <select id="select-poste2" class="bg-slate-900 text-slate-200 text-xs font-bold p-2 rounded-xl border border-slate-700 w-full text-center shadow-lg focus:border-orange-500">
-                            <!-- Options -->
-                        </select>
-                    </div>
-                </div>
-
-            </div>
-        </section>
-
-        <!-- TAB 5: REGISTRO DE JUGADORES -->
-        <section id="view-register" class="tab-content hidden space-y-6 max-w-2xl mx-auto">
-            <!-- Welcome Invitation Alert -->
-            <div id="invite-banner" class="hidden bg-gradient-to-r from-orange-600 to-amber-600 p-4 rounded-2xl text-white shadow-xl flex items-center gap-3">
-                <i class="fa-solid fa-envelope-open-text text-2xl"></i>
-                <div>
-                    <h3 class="font-bold text-sm">¡Has sido invitado al equipo One Coin!</h3>
-                    <p class="text-xs text-orange-100">Completa tu registro a continuación para unirte oficialmente a la plantilla.</p>
-                </div>
-            </div>
-
-            <div class="glass-panel p-6 rounded-3xl border border-slate-800 shadow-2xl">
-                <h2 class="text-xl font-black text-white mb-1">Registro de Nuevo Jugador</h2>
-                <p class="text-xs text-slate-400 mb-6">Completa tus datos personales para unirte a la plantilla activa.</p>
-
-                <form id="form-register-player" onsubmit="handlePlayerSubmit(event)" class="space-y-4">
-                    <div>
-                        <label class="block text-xs font-bold text-slate-300 uppercase mb-1">Nombre Completo / Apodo *</label>
-                        <input type="text" id="reg-name" required placeholder="ej. Carlos 'El Rayo' López" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-sm text-white focus:border-orange-500 focus:ring-1 focus:ring-orange-500 outline-none">
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-xs font-bold text-slate-300 uppercase mb-1">Posición Principal *</label>
-                            <select id="reg-position" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-sm text-white focus:border-orange-500 outline-none">
-                                <option value="Centro">Centro (Base/Guardia)</option>
-                                <option value="Ala">Ala (Escolta/Alero)</option>
-                                <option value="Poste">Poste (Ala-Pívot/Pívot)</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-slate-300 uppercase mb-1">Número de Jersey *</label>
-                            <input type="number" id="reg-number" required min="0" max="99" placeholder="7" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-sm text-white focus:border-orange-500 outline-none">
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-xs font-bold text-slate-300 uppercase mb-1">Estatura</label>
-                            <input type="text" id="reg-height" placeholder="ej. 1.85m" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-sm text-white focus:border-orange-500 outline-none">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-slate-300 uppercase mb-1">Teléfono (Contacto)</label>
-                            <input type="tel" id="reg-phone" placeholder="+52 ..." class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-sm text-white focus:border-orange-500 outline-none">
-                        </div>
-                    </div>
-
-                    <!-- Profile Photo Selection -->
-                    <div>
-                        <label class="block text-xs font-bold text-slate-300 uppercase mb-1">Foto de Perfil</label>
-                        <div class="flex items-center space-x-4">
-                            <img id="reg-photo-preview" src="https://placehold.co/100x100/1e293b/f97316?text=Perfil" class="w-14 h-14 rounded-2xl object-cover border border-slate-700">
-                            <div class="flex-grow space-y-2">
-                                <input type="file" accept="image/*" onchange="handleImageUpload(event, 'reg-photo-preview', 'reg-photo-url')" class="block w-full text-xs text-slate-400 file:mr-2 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-slate-800 file:text-slate-200 hover:file:bg-slate-700 cursor-pointer">
-                                <input type="text" id="reg-photo-url" placeholder="o pega una URL de imagen..." class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2 text-xs text-white focus:border-orange-500 outline-none">
-                            </div>
-                        </div>
-                    </div>
-
-                    <button type="submit" class="w-full bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700 text-white font-extrabold text-sm py-3.5 rounded-xl shadow-lg shadow-orange-500/20 transition mt-4">
-                        <i class="fa-solid fa-circle-check"></i> Completar Registro en One Coin
-                    </button>
-                </form>
-            </div>
-        </section>
-
-    </main>
-
-    <!-- FOOTER -->
-    <footer class="border-t border-slate-800/80 bg-slate-950 py-4 text-center text-xs text-slate-500">
-        <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-2">
-            <span>&copy; 2026 One Coin Basketball Team. Todos los derechos reservados.</span>
-            <div class="flex gap-4 text-slate-400">
-                <span class="hover:text-white cursor-pointer" onclick="openInviteModal()"><i class="fa-solid fa-link"></i> Enlace de Invitación</span>
-            </div>
-        </div>
-    </footer>
-
-    <!-- MODAL 1: INVITACIÓN -->
-    <div id="invite-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-        <div class="glass-panel border border-slate-800 rounded-3xl p-6 max-w-md w-full shadow-2xl relative space-y-4">
-            <button onclick="closeInviteModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-lg"><i class="fa-solid fa-xmark"></i></button>
-            <div class="text-center space-y-2">
-                <div class="w-12 h-12 bg-orange-500/20 rounded-2xl text-orange-400 flex items-center justify-center mx-auto text-xl border border-orange-500/30">
-                    <i class="fa-solid fa-user-plus"></i>
-                </div>
-                <h3 class="text-lg font-black text-white">Enlace de Invitación al Equipo</h3>
-                <p class="text-xs text-slate-400">Comparte este enlace con tus compañeros para que registren sus fichas de jugador.</p>
-            </div>
-
-            <div class="space-y-2">
-                <input type="text" id="invite-url-input" readonly class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-xs text-orange-400 font-mono text-center outline-none">
-                <div class="grid grid-cols-2 gap-2">
-                    <button onclick="copyInviteLink()" class="bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs py-2.5 rounded-xl border border-slate-700 transition flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-copy"></i> Copiar Enlace
-                    </button>
-                    <button onclick="shareWhatsAppInvite()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs py-2.5 rounded-xl transition flex items-center justify-center gap-2">
-                        <i class="fa-brands fa-whatsapp"></i> WhatsApp
-                    </button>
-                </div>
-            </div>
-
-            <div class="pt-2 border-t border-slate-800/80 text-center">
-                <button onclick="closeInviteModal(); triggerInviteFlow();" class="text-xs text-orange-400 hover:underline font-bold">
-                    ⚡ Probar Flujo de Invitación Ahora (Modo Prueba)
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL 2: CREAR PARTIDO -->
-    <div id="match-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-        <div class="glass-panel border border-slate-800 rounded-3xl p-6 max-w-md w-full shadow-2xl relative space-y-4">
-            <button onclick="closeMatchModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-lg"><i class="fa-solid fa-xmark"></i></button>
-            <h3 class="text-lg font-black text-white">Programar Nuevo Partido</h3>
-
-            <form onsubmit="handleCreateMatch(event)" class="space-y-3">
-                <div>
-                    <label class="block text-xs font-bold text-slate-300 uppercase mb-1">Rival / Opponent *</label>
-                    <input type="text" id="match-opponent" required placeholder="ej. Club Titanes" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white focus:border-orange-500 outline-none">
-                </div>
-
-                <div class="grid grid-cols-2 gap-3">
-                    <div>
-                        <label class="block text-xs font-bold text-slate-300 uppercase mb-1">Fecha *</label>
-                        <input type="date" id="match-date" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white focus:border-orange-500 outline-none">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-slate-300 uppercase mb-1">Hora *</label>
-                        <input type="time" id="match-time" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white focus:border-orange-500 outline-none">
-                    </div>
-                </div>
-
-                <div>
-                    <label class="block text-xs font-bold text-slate-300 uppercase mb-1">Lugar / Cancha *</label>
-                    <input type="text" id="match-location" required placeholder="ej. Cancha Municipal #2" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white focus:border-orange-500 outline-none">
-                </div>
-
-                <button type="submit" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-extrabold text-xs py-3 rounded-xl shadow-lg shadow-orange-500/20 transition">
-                    Guardar Partido
-                </button>
-            </form>
-        </div>
-    </div>
-
-    <!-- MODAL 3: FICHA COLECCIONABLE DEL JUGADOR -->
-    <div id="card-modal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-gradient-to-b from-slate-900 to-slate-950 border-2 border-orange-500/60 rounded-3xl p-6 max-w-sm w-full shadow-2xl relative text-center space-y-4">
-            <button onclick="closeCardModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-lg"><i class="fa-solid fa-xmark"></i></button>
-            
-            <div class="relative inline-block mt-2">
-                <img id="card-photo" src="" class="w-28 h-28 rounded-full object-cover border-4 border-orange-500 mx-auto shadow-2xl">
-                <span id="card-number" class="absolute -bottom-2 right-0 bg-orange-500 text-white font-black text-sm px-2.5 py-0.5 rounded-full shadow-md">#0</span>
-            </div>
-
-            <div>
-                <h3 id="card-name" class="text-xl font-black text-white">Nombre</h3>
-                <p id="card-position" class="text-xs text-orange-400 font-bold uppercase">Posición</p>
-                <p id="card-height" class="text-[11px] text-slate-400">Estatura</p>
-            </div>
-
-            <div class="grid grid-cols-3 gap-2 bg-slate-900/80 p-3 rounded-2xl border border-slate-800 text-center text-xs">
-                <div>
-                    <span class="text-slate-500 block text-[10px] uppercase font-bold">PPP</span>
-                    <span id="card-ppp" class="font-black text-white text-sm">0.0</span>
-                </div>
-                <div>
-                    <span class="text-slate-500 block text-[10px] uppercase font-bold">TPP</span>
-                    <span id="card-tpp" class="font-black text-white text-sm">0.0
+                        <select id="select-poste2" class="bg-slate-900 text-slate-200 text-xs font-bold p-
