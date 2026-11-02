@@ -44,7 +44,7 @@
             background-size: 16px 16px;
         }
         .glass-panel {
-            background: rgba(15, 23, 42, 0.75);
+            background: rgba(15, 23, 42, 0.85);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
         }
@@ -64,7 +64,7 @@
     <!-- TOP HEADER -->
     <header class="sticky top-0 z-40 border-b border-slate-800 glass-panel shadow-2xl">
         <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
-            <div class="flex items-center space-x-3 cursor-pointer" id="logo-home-btn">
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('roster')">
                 <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-orange-500 to-amber-600 flex items-center justify-center text-white shadow-lg shadow-orange-500/30">
                     <i class="fa-solid fa-basketball text-xl animate-pulse"></i>
                 </div>
@@ -85,18 +85,18 @@
 
                 <div class="player-only flex items-center gap-2 bg-slate-900 border border-slate-800 px-3 py-1.5 rounded-full shadow-inner">
                     <img id="active-user-avatar" src="https://placehold.co/100x100/1e293b/f97316?text=User" class="w-6 h-6 rounded-full object-cover border border-orange-500">
-                    <select id="active-user-select" class="bg-transparent text-xs font-bold text-slate-200 outline-none cursor-pointer">
+                    <select id="active-user-select" onchange="changeActiveUser(this.value)" class="bg-transparent text-xs font-bold text-slate-200 outline-none cursor-pointer">
                         <option value="">Seleccionar Identidad...</option>
                     </select>
                 </div>
 
-                <!-- Botón de Iniciar Sesión / Cerrar Sesión -->
-                <button type="button" id="btn-auth" class="bg-slate-800 hover:bg-slate-700 text-orange-400 border border-orange-500/40 font-extrabold text-xs px-3.5 py-2 rounded-xl shadow-lg flex items-center gap-2 transition active:scale-95 cursor-pointer">
+                <!-- Botón de Iniciar Sesión / Cerrar Sesión (Acceso Directo) -->
+                <button type="button" id="btn-auth" onclick="toggleAuthModal()" class="bg-slate-800 hover:bg-slate-700 text-orange-400 border border-orange-500/40 font-extrabold text-xs px-3.5 py-2 rounded-xl shadow-lg flex items-center gap-2 transition active:scale-95 cursor-pointer">
                     <i class="fa-solid fa-key"></i> <span id="btn-auth-text">Soy Jugador</span>
                 </button>
 
                 <!-- EXCLUSIVO DE JUGADORES: Botón de Invitar -->
-                <button type="button" id="btn-invite-top" class="player-only bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-extrabold text-xs px-3.5 py-2 rounded-xl shadow-lg shadow-orange-500/20 flex items-center gap-2 transition active:scale-95 cursor-pointer">
+                <button type="button" onclick="openInviteModal()" class="player-only bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-extrabold text-xs px-3.5 py-2 rounded-xl shadow-lg shadow-orange-500/20 flex items-center gap-2 transition active:scale-95 cursor-pointer">
                     <i class="fa-solid fa-user-plus"></i> <span class="hidden md:inline">Invitar Jugadores</span>
                 </button>
             </div>
@@ -104,19 +104,19 @@
 
         <!-- NAVIGATION TABS -->
         <nav class="flex border-t border-slate-800/80 max-w-7xl mx-auto px-4 overflow-x-auto scrollbar-none text-xs font-bold">
-            <button type="button" data-target="roster" id="tab-roster" class="tab-btn px-4 py-3 text-orange-400 border-b-2 border-orange-500 flex items-center gap-2 whitespace-nowrap transition-colors cursor-pointer">
+            <button type="button" onclick="switchTab('roster')" id="tab-roster" class="tab-btn px-4 py-3 text-orange-400 border-b-2 border-orange-500 flex items-center gap-2 whitespace-nowrap transition-colors cursor-pointer">
                 <i class="fa-solid fa-users"></i> Plantilla (Roster)
             </button>
-            <button type="button" data-target="matches" id="tab-matches" class="tab-btn px-4 py-3 text-slate-400 hover:text-slate-200 flex items-center gap-2 whitespace-nowrap transition-colors cursor-pointer">
+            <button type="button" onclick="switchTab('matches')" id="tab-matches" class="tab-btn px-4 py-3 text-slate-400 hover:text-slate-200 flex items-center gap-2 whitespace-nowrap transition-colors cursor-pointer">
                 <i class="fa-solid fa-calendar-days"></i> Partidos & Asistencia
             </button>
-            <button type="button" data-target="ratings" id="tab-ratings" class="tab-btn px-4 py-3 text-slate-400 hover:text-slate-200 flex items-center gap-2 whitespace-nowrap transition-colors cursor-pointer">
+            <button type="button" onclick="switchTab('ratings')" id="tab-ratings" class="tab-btn px-4 py-3 text-slate-400 hover:text-slate-200 flex items-center gap-2 whitespace-nowrap transition-colors cursor-pointer">
                 <i class="fa-solid fa-star"></i> Valoraciones & Stats (1-10)
             </button>
-            <button type="button" data-target="tactics" id="tab-tactics" class="tab-btn px-4 py-3 text-slate-400 hover:text-slate-200 flex items-center gap-2 whitespace-nowrap transition-colors cursor-pointer">
+            <button type="button" onclick="switchTab('tactics')" id="tab-tactics" class="tab-btn px-4 py-3 text-slate-400 hover:text-slate-200 flex items-center gap-2 whitespace-nowrap transition-colors cursor-pointer">
                 <i class="fa-solid fa-chess-board"></i> Pizarra Táctica (2-3)
             </button>
-            <button type="button" data-target="register" id="tab-register" class="player-only tab-btn px-4 py-3 text-slate-400 hover:text-slate-200 flex items-center gap-2 whitespace-nowrap transition-colors cursor-pointer">
+            <button type="button" onclick="switchTab('register')" id="tab-register" class="player-only tab-btn px-4 py-3 text-slate-400 hover:text-slate-200 flex items-center gap-2 whitespace-nowrap transition-colors cursor-pointer">
                 <i class="fa-solid fa-user-plus"></i> Registro
             </button>
         </nav>
@@ -157,11 +157,11 @@
                     </h2>
                     <p class="text-xs text-slate-400">Filtrar por posición táctica (Poste, Centro, Ala)</p>
                 </div>
-                <div class="flex flex-wrap gap-1.5" id="filter-container">
-                    <button type="button" data-pos="All" class="pos-filter-btn px-3 py-1.5 rounded-lg bg-orange-600 text-white font-bold text-xs shadow-md cursor-pointer">Todos</button>
-                    <button type="button" data-pos="Centro" class="pos-filter-btn px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 border border-slate-700 text-xs hover:border-slate-500 cursor-pointer">Centro</button>
-                    <button type="button" data-pos="Ala" class="pos-filter-btn px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 border border-slate-700 text-xs hover:border-slate-500 cursor-pointer">Ala</button>
-                    <button type="button" data-pos="Poste" class="pos-filter-btn px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 border border-slate-700 text-xs hover:border-slate-500 cursor-pointer">Poste</button>
+                <div class="flex flex-wrap gap-1.5">
+                    <button type="button" onclick="filterPosition('All')" data-pos="All" class="pos-filter-btn px-3 py-1.5 rounded-lg bg-orange-600 text-white font-bold text-xs shadow-md cursor-pointer">Todos</button>
+                    <button type="button" onclick="filterPosition('Centro')" data-pos="Centro" class="pos-filter-btn px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 border border-slate-700 text-xs hover:border-slate-500 cursor-pointer">Centro</button>
+                    <button type="button" onclick="filterPosition('Ala')" data-pos="Ala" class="pos-filter-btn px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 border border-slate-700 text-xs hover:border-slate-500 cursor-pointer">Ala</button>
+                    <button type="button" onclick="filterPosition('Poste')" data-pos="Poste" class="pos-filter-btn px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 border border-slate-700 text-xs hover:border-slate-500 cursor-pointer">Poste</button>
                 </div>
             </div>
             <div id="roster-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"></div>
@@ -174,7 +174,7 @@
                     <h2 class="text-lg font-black text-white">Calendario de Partidos</h2>
                     <p class="text-xs text-slate-400">Votación de asistencia y fechas del equipo</p>
                 </div>
-                <button type="button" id="btn-open-match-modal" class="player-only bg-orange-500 hover:bg-orange-600 text-white font-bold text-xs px-4 py-2 rounded-xl flex items-center gap-2 shadow-lg shadow-orange-500/20 cursor-pointer">
+                <button type="button" onclick="openMatchModal()" class="player-only bg-orange-500 hover:bg-orange-600 text-white font-bold text-xs px-4 py-2 rounded-xl flex items-center gap-2 shadow-lg shadow-orange-500/20 cursor-pointer">
                     <i class="fa-solid fa-plus"></i> Programar Partido
                 </button>
             </div>
@@ -197,10 +197,6 @@
                             <th class="p-3 text-center">Pts (PPP)</th>
                             <th class="p-3 text-center">Tap (TPP)</th>
                             <th class="p-3 text-center">Ast (APP)</th>
-                            <th class="p-3 text-center">Tiro</th>
-                            <th class="p-3 text-center">Defensa</th>
-                            <th class="p-3 text-center">Pase</th>
-                            <th class="p-3 text-center">Equipo</th>
                             <th class="p-3 text-center">Promedio</th>
                         </tr>
                     </thead>
@@ -209,115 +205,90 @@
             </div>
         </section>
 
-        <!-- TAB 4: PIZARRA TÁCTICA 2-3 (CON FOTOS DE PERFIL) -->
+        <!-- TAB 4: PIZARRA TÁCTICA 2-3 -->
         <section id="view-tactics" class="tab-pane space-y-6">
             <div class="bg-slate-900/60 p-4 rounded-2xl border border-slate-800 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
                     <h2 class="text-lg font-black text-white">Formación Táctica 2-3 (Quinteto Titular)</h2>
                     <p class="text-xs text-slate-400">3 Perímetro (Centro y 2 Alas) + 2 Pintura (Postes)</p>
                 </div>
-                <button type="button" id="btn-save-tactics" class="player-only bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs px-4 py-2 rounded-xl shadow-lg shadow-emerald-600/20 cursor-pointer">
+                <button type="button" onclick="saveTactics()" class="player-only bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs px-4 py-2 rounded-xl shadow-lg shadow-emerald-600/20 cursor-pointer">
                     <i class="fa-solid fa-floppy-disk"></i> Guardar Quinteto
                 </button>
             </div>
 
             <div class="court-bg border border-slate-700 rounded-3xl p-6 min-h-[500px] relative flex flex-col justify-between shadow-2xl">
-                
-                <!-- LÍNEA DE PERÍMETRO (3 JUGADORES) -->
                 <div class="grid grid-cols-3 gap-4 text-center z-10 pt-2">
-                    
-                    <!-- ALA 1 -->
                     <div class="flex flex-col items-center">
                         <span class="text-[10px] font-extrabold text-orange-400 bg-slate-900/90 px-2 py-0.5 rounded border border-orange-500/30 uppercase mb-2">Ala 1</span>
                         <div class="relative group mb-2">
                             <img id="img-tactic-ala1" src="https://placehold.co/100x100/1e293b/f97316?text=Ala+1" class="w-16 h-16 rounded-full object-cover border-2 border-orange-500 shadow-xl mx-auto">
                             <span id="badge-tactic-ala1" class="absolute -bottom-1 -right-1 bg-orange-500 text-white font-black text-[10px] px-1.5 py-0.5 rounded-full shadow">#--</span>
                         </div>
-                        <select id="select-ala1" class="bg-slate-900 text-slate-200 text-xs font-bold p-2 rounded-xl border border-slate-700 w-full max-w-[160px] text-center shadow-lg focus:border-orange-500 outline-none cursor-pointer"></select>
+                        <select id="select-ala1" onchange="updateTacticalSlotVisual('ala1', this.value)" class="bg-slate-900 text-slate-200 text-xs font-bold p-2 rounded-xl border border-slate-700 w-full max-w-[160px] text-center shadow-lg focus:border-orange-500 outline-none cursor-pointer"></select>
                     </div>
 
-                    <!-- CENTRO -->
                     <div class="flex flex-col items-center">
                         <span class="text-[10px] font-extrabold text-amber-400 bg-slate-900/90 px-2 py-0.5 rounded border border-amber-500/30 uppercase mb-2">Centro / Base</span>
                         <div class="relative group mb-2">
                             <img id="img-tactic-centro" src="https://placehold.co/100x100/1e293b/f97316?text=Centro" class="w-16 h-16 rounded-full object-cover border-2 border-amber-500 shadow-xl mx-auto">
                             <span id="badge-tactic-centro" class="absolute -bottom-1 -right-1 bg-amber-500 text-white font-black text-[10px] px-1.5 py-0.5 rounded-full shadow">#--</span>
                         </div>
-                        <select id="select-centro" class="bg-slate-900 text-slate-200 text-xs font-bold p-2 rounded-xl border border-slate-700 w-full max-w-[160px] text-center shadow-lg focus:border-orange-500 outline-none cursor-pointer"></select>
+                        <select id="select-centro" onchange="updateTacticalSlotVisual('centro', this.value)" class="bg-slate-900 text-slate-200 text-xs font-bold p-2 rounded-xl border border-slate-700 w-full max-w-[160px] text-center shadow-lg focus:border-orange-500 outline-none cursor-pointer"></select>
                     </div>
 
-                    <!-- ALA 2 -->
                     <div class="flex flex-col items-center">
                         <span class="text-[10px] font-extrabold text-orange-400 bg-slate-900/90 px-2 py-0.5 rounded border border-orange-500/30 uppercase mb-2">Ala 2</span>
                         <div class="relative group mb-2">
                             <img id="img-tactic-ala2" src="https://placehold.co/100x100/1e293b/f97316?text=Ala+2" class="w-16 h-16 rounded-full object-cover border-2 border-orange-500 shadow-xl mx-auto">
                             <span id="badge-tactic-ala2" class="absolute -bottom-1 -right-1 bg-orange-500 text-white font-black text-[10px] px-1.5 py-0.5 rounded-full shadow">#--</span>
                         </div>
-                        <select id="select-ala2" class="bg-slate-900 text-slate-200 text-xs font-bold p-2 rounded-xl border border-slate-700 w-full max-w-[160px] text-center shadow-lg focus:border-orange-500 outline-none cursor-pointer"></select>
+                        <select id="select-ala2" onchange="updateTacticalSlotVisual('ala2', this.value)" class="bg-slate-900 text-slate-200 text-xs font-bold p-2 rounded-xl border border-slate-700 w-full max-w-[160px] text-center shadow-lg focus:border-orange-500 outline-none cursor-pointer"></select>
                     </div>
-
                 </div>
 
-                <!-- LÍNEA DE TRES PUNTOS / ÁREA INTERIOR -->
                 <div class="self-center my-4 border-2 border-slate-600/50 w-48 h-28 rounded-b-3xl relative flex items-center justify-center bg-orange-500/5">
                     <div class="w-12 h-12 rounded-full border border-orange-500/40"></div>
                 </div>
 
-                <!-- LÍNEA DE PINTURA (2 POSTES) -->
                 <div class="grid grid-cols-2 gap-12 text-center z-10 pb-2 max-w-lg mx-auto w-full">
-                    
-                    <!-- POSTE 1 -->
                     <div class="flex flex-col items-center">
-                        <span class="text-[10px] font-extrabold text-emerald-400 bg-slate-900/90 px-2 py-0.5 rounded border border-emerald-500/30 uppercase mb-2">Poste 1 (Interior)</span>
+                        <span class="text-[10px] font-extrabold text-emerald-400 bg-slate-900/90 px-2 py-0.5 rounded border border-emerald-500/30 uppercase mb-2">Poste 1</span>
                         <div class="relative group mb-2">
                             <img id="img-tactic-poste1" src="https://placehold.co/100x100/1e293b/f97316?text=Poste+1" class="w-16 h-16 rounded-full object-cover border-2 border-emerald-500 shadow-xl mx-auto">
                             <span id="badge-tactic-poste1" class="absolute -bottom-1 -right-1 bg-emerald-500 text-white font-black text-[10px] px-1.5 py-0.5 rounded-full shadow">#--</span>
                         </div>
-                        <select id="select-poste1" class="bg-slate-900 text-slate-200 text-xs font-bold p-2 rounded-xl border border-slate-700 w-full text-center shadow-lg focus:border-orange-500 outline-none cursor-pointer"></select>
+                        <select id="select-poste1" onchange="updateTacticalSlotVisual('poste1', this.value)" class="bg-slate-900 text-slate-200 text-xs font-bold p-2 rounded-xl border border-slate-700 w-full text-center shadow-lg focus:border-orange-500 outline-none cursor-pointer"></select>
                     </div>
 
-                    <!-- POSTE 2 -->
                     <div class="flex flex-col items-center">
-                        <span class="text-[10px] font-extrabold text-emerald-400 bg-slate-900/90 px-2 py-0.5 rounded border border-emerald-500/30 uppercase mb-2">Poste 2 (Interior)</span>
+                        <span class="text-[10px] font-extrabold text-emerald-400 bg-slate-900/90 px-2 py-0.5 rounded border border-emerald-500/30 uppercase mb-2">Poste 2</span>
                         <div class="relative group mb-2">
                             <img id="img-tactic-poste2" src="https://placehold.co/100x100/1e293b/f97316?text=Poste+2" class="w-16 h-16 rounded-full object-cover border-2 border-emerald-500 shadow-xl mx-auto">
                             <span id="badge-tactic-poste2" class="absolute -bottom-1 -right-1 bg-emerald-500 text-white font-black text-[10px] px-1.5 py-0.5 rounded-full shadow">#--</span>
                         </div>
-                        <select id="select-poste2" class="bg-slate-900 text-slate-200 text-xs font-bold p-2 rounded-xl border border-slate-700 w-full text-center shadow-lg focus:border-orange-500 outline-none cursor-pointer"></select>
+                        <select id="select-poste2" onchange="updateTacticalSlotVisual('poste2', this.value)" class="bg-slate-900 text-slate-200 text-xs font-bold p-2 rounded-xl border border-slate-700 w-full text-center shadow-lg focus:border-orange-500 outline-none cursor-pointer"></select>
                     </div>
-
                 </div>
-
             </div>
         </section>
 
-        <!-- TAB 5: REGISTRO DE JUGADORES (SOLO PARA JUGADORES AUTENTICADOS) -->
+        <!-- TAB 5: REGISTRO -->
         <section id="view-register" class="tab-pane player-only space-y-6 max-w-2xl mx-auto">
-            <div id="invite-banner" class="hidden bg-gradient-to-r from-orange-600 to-amber-600 p-4 rounded-2xl text-white shadow-xl flex items-center gap-3">
-                <i class="fa-solid fa-envelope-open-text text-2xl"></i>
-                <div>
-                    <h3 class="font-bold text-sm">¡Has sido invitado al equipo One Coin!</h3>
-                    <p class="text-xs text-orange-100">Completa tu registro a continuación para unirte oficialmente a la plantilla.</p>
-                </div>
-            </div>
-
             <div class="glass-panel p-6 rounded-3xl border border-slate-800 shadow-2xl">
                 <h2 class="text-xl font-black text-white mb-1">Registro de Nuevo Jugador</h2>
-                <p class="text-xs text-slate-400 mb-6">Completa tus datos personales para unirte a la plantilla activa.</p>
-
-                <form id="form-register-player" class="space-y-4">
+                <form id="form-register-player" onsubmit="registerPlayer(event)" class="space-y-4">
                     <div>
                         <label class="block text-xs font-bold text-slate-300 uppercase mb-1">Nombre Completo / Apodo *</label>
-                        <input type="text" id="reg-name" required placeholder="ej. Carlos 'El Rayo' López" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-sm text-white focus:border-orange-500 outline-none">
+                        <input type="text" id="reg-name" required placeholder="ej. Carlos López" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-sm text-white focus:border-orange-500 outline-none">
                     </div>
-
                     <div class="grid grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-xs font-bold text-slate-300 uppercase mb-1">Posición Principal *</label>
+                            <label class="block text-xs font-bold text-slate-300 uppercase mb-1">Posición *</label>
                             <select id="reg-position" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-sm text-white focus:border-orange-500 outline-none cursor-pointer">
-                                <option value="Centro">Centro (Base/Guardia)</option>
-                                <option value="Ala">Ala (Escolta/Alero)</option>
-                                <option value="Poste">Poste (Ala-Pívot/Pívot)</option>
+                                <option value="Centro">Centro</option>
+                                <option value="Ala">Ala</option>
+                                <option value="Poste">Poste</option>
                             </select>
                         </div>
                         <div>
@@ -325,52 +296,337 @@
                             <input type="number" id="reg-number" required min="0" max="99" placeholder="7" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-sm text-white focus:border-orange-500 outline-none">
                         </div>
                     </div>
-
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-xs font-bold text-slate-300 uppercase mb-1">Estatura</label>
-                            <input type="text" id="reg-height" placeholder="ej. 1.85m" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-sm text-white focus:border-orange-500 outline-none">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-slate-300 uppercase mb-1">Teléfono (Contacto)</label>
-                            <input type="tel" id="reg-phone" placeholder="+52 ..." class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-sm text-white focus:border-orange-500 outline-none">
-                        </div>
-                    </div>
-
                     <div>
-                        <label class="block text-xs font-bold text-slate-300 uppercase mb-1">Foto de Perfil</label>
-                        <div class="flex items-center space-x-4">
-                            <img id="reg-photo-preview" src="https://placehold.co/100x100/1e293b/f97316?text=Perfil" class="w-14 h-14 rounded-2xl object-cover border border-slate-700">
-                            <div class="flex-grow space-y-2">
-                                <input type="file" accept="image/*" id="reg-photo-file" class="block w-full text-xs text-slate-400 file:mr-2 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-slate-800 file:text-slate-200 hover:file:bg-slate-700 cursor-pointer">
-                                <input type="text" id="reg-photo-url" placeholder="o pega una URL de imagen..." class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2 text-xs text-white focus:border-orange-500 outline-none">
-                            </div>
-                        </div>
+                        <label class="block text-xs font-bold text-slate-300 uppercase mb-1">URL de Foto</label>
+                        <input type="text" id="reg-photo-url" placeholder="https://..." class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2 text-xs text-white focus:border-orange-500 outline-none">
                     </div>
-
-                    <button type="submit" class="w-full bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700 text-white font-extrabold text-sm py-3.5 rounded-xl shadow-lg shadow-orange-500/20 transition mt-4 cursor-pointer">
-                        <i class="fa-solid fa-circle-check"></i> Completar Registro en One Coin
+                    <button type="submit" class="w-full bg-gradient-to-r from-orange-500 to-amber-600 text-white font-extrabold text-sm py-3.5 rounded-xl cursor-pointer">
+                        Completar Registro
                     </button>
                 </form>
             </div>
         </section>
-
     </main>
 
     <!-- FOOTER -->
     <footer class="border-t border-slate-800/80 bg-slate-950 py-4 text-center text-xs text-slate-500">
-        <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-2">
-            <span>&copy; 2026 One Coin Basketball Team. Todos los derechos reservados.</span>
-            <div class="flex gap-4 text-slate-400">
-                <span class="player-only hover:text-white cursor-pointer" id="footer-invite-link"><i class="fa-solid fa-link"></i> Enlace de Invitación</span>
-            </div>
+        <div class="max-w-7xl mx-auto px-4 flex justify-between items-center">
+            <span>&copy; 2026 One Coin Basketball Team</span>
+            <span class="player-only hover:text-white cursor-pointer" onclick="openInviteModal()">Enlace de Invitación</span>
         </div>
     </footer>
 
-    <!-- MODALS -->
-    <!-- MODAL INICIO DE SESIÓN JUGADOR (PIN / CLAVE) -->
+    <!-- MODAL AUTENTICACIÓN -->
     <div id="auth-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
         <div class="glass-panel border border-slate-800 rounded-3xl p-6 max-w-sm w-full shadow-2xl relative space-y-4 text-center">
-            <button type="button" id="close-auth-modal" class="absolute top-4 right-4 text-slate-400 hover:text-white text-lg cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
-            <div class="w-12 h-12 bg-orange-500/20 rounded-2xl text-orange-400 flex items-center justify-center mx-auto text-xl border border-orange-500/30">
-                <i class="fa-solid fa-user-lock
+            <button type="button" onclick="toggleAuthModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-lg cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
+            <h3 class="text-lg font-black text-white">Acceso Jugadores One Coin</h3>
+            <form onsubmit="handleAuth(event)" class="space-y-3">
+                <input type="password" id="auth-pin" required placeholder="Clave (ej. 1234)" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-center text-sm text-white outline-none font-mono">
+                <button type="submit" class="w-full bg-orange-500 text-white font-extrabold text-xs py-3 rounded-xl cursor-pointer">Ingresar</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL INVITACIÓN -->
+    <div id="invite-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="glass-panel border border-slate-800 rounded-3xl p-6 max-w-md w-full shadow-2xl relative space-y-4 text-center">
+            <button type="button" onclick="closeInviteModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-lg cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
+            <h3 class="text-lg font-black text-white">Enlace de Invitación</h3>
+            <input type="text" id="invite-url-input" readonly class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-xs text-orange-400 font-mono text-center outline-none">
+            <button type="button" onclick="copyInviteLink()" class="w-full bg-slate-800 text-white font-bold text-xs py-2.5 rounded-xl cursor-pointer">Copiar Enlace</button>
+        </div>
+    </div>
+
+    <!-- MODAL PARTIDOS -->
+    <div id="match-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="glass-panel border border-slate-800 rounded-3xl p-6 max-w-md w-full shadow-2xl relative space-y-4">
+            <button type="button" onclick="closeMatchModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-lg cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
+            <h3 class="text-lg font-black text-white">Programar Partido</h3>
+            <form onsubmit="createMatch(event)" class="space-y-3">
+                <input type="text" id="match-opponent" required placeholder="Rival" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white outline-none">
+                <input type="date" id="match-date" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white outline-none">
+                <input type="time" id="match-time" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white outline-none">
+                <input type="text" id="match-location" required placeholder="Cancha" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white outline-none">
+                <button type="submit" class="w-full bg-orange-500 text-white font-extrabold text-xs py-3 rounded-xl cursor-pointer">Guardar</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- SCRIPT CENTRAL DIRECTO -->
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyBSN_GRCcgWGgWFwxkvDXQJs5Kl19oBGb4",
+            authDomain: "one-coin-basketball.firebaseapp.com",
+            databaseURL: "https://one-coin-basketball-default-rtdb.firebaseio.com",
+            projectId: "one-coin-basketball",
+            storageBucket: "one-coin-basketball.firebasestorage.app",
+            messagingSenderId: "589947730366",
+            appId: "1:589947730366:web:1855f80682af673035a1ef"
+        };
+
+        let db = null;
+        try {
+            firebase.initializeApp(firebaseConfig);
+            db = firebase.database();
+        } catch (e) { console.error(e); }
+
+        let players = [];
+        let matches = [];
+        let startingFive = { ala1: '', centro: '', ala2: '', poste1: '', poste2: '' };
+        let activePlayerId = localStorage.getItem('onecoin_active_player') || null;
+        let isPlayerLoggedIn = localStorage.getItem('onecoin_is_player') === 'true';
+        let currentPosFilter = 'All';
+        const TEAM_PIN = "1234";
+
+        function updateRoleUI() {
+            const body = document.body;
+            const roleBadge = document.getElementById('role-badge');
+            const btnAuthText = document.getElementById('btn-auth-text');
+
+            if (isPlayerLoggedIn) {
+                if (body) body.classList.remove('is-spectator');
+                if (roleBadge) {
+                    roleBadge.className = "flex items-center gap-1.5 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-3 py-1 rounded-full text-xs font-bold";
+                    roleBadge.innerHTML = '<i class="fa-solid fa-user-check text-emerald-400"></i> <span>Jugador Activo</span>';
+                }
+                if (btnAuthText) btnAuthText.textContent = "Cerrar Sesión";
+            } else {
+                if (body) body.classList.add('is-spectator');
+                if (roleBadge) {
+                    roleBadge.className = "flex items-center gap-1.5 bg-slate-800 text-slate-300 border border-slate-700 px-3 py-1 rounded-full text-xs font-bold";
+                    roleBadge.innerHTML = '<i class="fa-solid fa-eye text-amber-400"></i> <span>Modo Público</span>';
+                }
+                if (btnAuthText) btnAuthText.textContent = "Soy Jugador";
+            }
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-pane').forEach(el => el.classList.remove('active-pane'));
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.className = 'tab-btn px-4 py-3 text-slate-400 hover:text-slate-200 flex items-center gap-2 whitespace-nowrap transition-colors cursor-pointer');
+
+            const activeView = document.getElementById(`view-${tabId}`);
+            const activeTabBtn = document.getElementById(`tab-${tabId}`);
+            if (activeView) activeView.classList.add('active-pane');
+            if (activeTabBtn) activeTabBtn.className = 'tab-btn px-4 py-3 text-orange-400 border-b-2 border-orange-500 flex items-center gap-2 whitespace-nowrap transition-colors cursor-pointer';
+        }
+
+        function toggleAuthModal() {
+            if (isPlayerLoggedIn) {
+                isPlayerLoggedIn = false;
+                localStorage.setItem('onecoin_is_player', 'false');
+                renderAllViews();
+                alert('Has cerrado sesión.');
+            } else {
+                const modal = document.getElementById('auth-modal');
+                if (modal) modal.classList.toggle('hidden');
+            }
+        }
+
+        function handleAuth(e) {
+            e.preventDefault();
+            const pin = document.getElementById('auth-pin').value.trim();
+            if (pin === TEAM_PIN) {
+                isPlayerLoggedIn = true;
+                localStorage.setItem('onecoin_is_player', 'true');
+                document.getElementById('auth-modal').classList.add('hidden');
+                document.getElementById('auth-pin').value = '';
+                renderAllViews();
+                alert('¡Acceso concedido!');
+            } else {
+                alert('Clave incorrecta.');
+            }
+        }
+
+        function openInviteModal() {
+            if (!isPlayerLoggedIn) {
+                alert('Inicia sesión como jugador primero.');
+                return;
+            }
+            const modal = document.getElementById('invite-modal');
+            const input = document.getElementById('invite-url-input');
+            if (modal && input) {
+                input.value = window.location.href.split('#')[0];
+                modal.classList.remove('hidden');
+            }
+        }
+
+        function closeInviteModal() { document.getElementById('invite-modal').classList.add('hidden'); }
+        function copyInviteLink() {
+            const input = document.getElementById('invite-url-input');
+            input.select();
+            document.execCommand('copy');
+            alert('¡Enlace copiado!');
+        }
+
+        function openMatchModal() { document.getElementById('match-modal').classList.remove('hidden'); }
+        function closeMatchModal() { document.getElementById('match-modal').classList.add('hidden'); }
+
+        function saveState() {
+            if (!db || !isPlayerLoggedIn) return;
+            db.ref('onecoin_data').set({ players, matches, startingFive }).catch(err => console.error(err));
+        }
+
+        function loadFromCloud() {
+            if (!db) { renderAllViews(); return; }
+            db.ref('onecoin_data').once('value').then((snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    players = Array.isArray(data.players) ? data.players : [];
+                    matches = Array.isArray(data.matches) ? data.matches : [];
+                    startingFive = data.startingFive || startingFive;
+                }
+                renderAllViews();
+            }).catch(() => renderAllViews());
+        }
+
+        function renderAllViews() {
+            updateRoleUI();
+            updateActiveUserDropdown();
+            renderSeasonBanner();
+            renderRoster();
+            renderRatingsTable();
+            populateTacticalSelects();
+        }
+
+        function updateActiveUserDropdown() {
+            const select = document.getElementById('active-user-select');
+            if (!select) return;
+            select.innerHTML = '';
+            if (players.length === 0) {
+                select.innerHTML = '<option value="">Sin jugadores</option>';
+                return;
+            }
+            players.forEach(p => {
+                const opt = document.createElement('option');
+                opt.value = p.id;
+                opt.textContent = `${p.name} (#${p.number})`;
+                if (p.id === activePlayerId) opt.selected = true;
+                select.appendChild(opt);
+            });
+        }
+
+        function changeActiveUser(id) {
+            activePlayerId = id;
+            localStorage.setItem('onecoin_active_player', activePlayerId);
+        }
+
+        function filterPosition(pos) {
+            currentPosFilter = pos;
+            renderRoster();
+        }
+
+        function renderRoster() {
+            const grid = document.getElementById('roster-grid');
+            const badge = document.getElementById('player-count-badge');
+            if (!grid) return;
+            grid.innerHTML = '';
+            const filtered = currentPosFilter === 'All' ? players : players.filter(p => p.position === currentPosFilter);
+            if (badge) badge.textContent = players.length;
+
+            if (filtered.length === 0) {
+                grid.innerHTML = '<div class="col-span-full text-center text-slate-500 py-8 text-sm">No hay jugadores registrados. Haz clic en "Soy Jugador" (PIN: 1234) para registrarte.</div>';
+                return;
+            }
+
+            filtered.forEach(p => {
+                const card = document.createElement('div');
+                card.className = "glass-panel p-4 rounded-2xl border border-slate-800 space-y-3";
+                card.innerHTML = `
+                    <div class="flex items-center space-x-3">
+                        <img src="${p.photo || 'https://placehold.co/100'}" class="w-14 h-14 rounded-2xl object-cover border border-slate-700">
+                        <div>
+                            <span class="text-orange-400 font-bold text-xs">#${p.number} - ${p.position}</span>
+                            <h3 class="font-bold text-white text-base">${p.name}</h3>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function renderRatingsTable() {
+            const tbody = document.getElementById('ratings-table-body');
+            if (!tbody) return;
+            tbody.innerHTML = players.length === 0 ? '<tr><td colspan="7" class="p-4 text-center text-slate-500">Sin datos</td></tr>' : '';
+        }
+
+        function populateTacticalSelects() {
+            ['ala1', 'centro', 'ala2', 'poste1', 'poste2'].forEach(slot => {
+                const sel = document.getElementById(`select-${slot}`);
+                if (!sel) return;
+                sel.innerHTML = '<option value="">-- Vacío --</option>';
+                players.forEach(p => {
+                    const selAttr = startingFive[slot] === p.id ? 'selected' : '';
+                    sel.innerHTML += `<option value="${p.id}" ${selAttr}>#${p.number} ${p.name}</option>`;
+                });
+                updateTacticalSlotVisual(slot, startingFive[slot]);
+            });
+        }
+
+        function updateTacticalSlotVisual(slot, playerId) {
+            const p = players.find(x => x.id === playerId);
+            const img = document.getElementById(`img-tactic-${slot}`);
+            const badge = document.getElementById(`badge-tactic-${slot}`);
+            if (p) {
+                if (img) img.src = p.photo || 'https://placehold.co/100';
+                if (badge) badge.textContent = `#${p.number}`;
+            } else {
+                if (img) img.src = `https://placehold.co/100x100/1e293b/f97316?text=${slot}`;
+                if (badge) badge.textContent = '#--';
+            }
+        }
+
+        function saveTactics() {
+            startingFive = {
+                ala1: document.getElementById('select-ala1').value,
+                centro: document.getElementById('select-centro').value,
+                ala2: document.getElementById('select-ala2').value,
+                poste1: document.getElementById('select-poste1').value,
+                poste2: document.getElementById('select-poste2').value
+            };
+            saveState();
+            alert('¡Quinteto guardado!');
+        }
+
+        function registerPlayer(e) {
+            e.preventDefault();
+            const name = document.getElementById('reg-name').value.trim();
+            const position = document.getElementById('reg-position').value;
+            const number = parseInt(document.getElementById('reg-number').value);
+            const photo = document.getElementById('reg-photo-url').value.trim() || 'https://placehold.co/100';
+
+            const newPlayer = { id: 'p_' + Date.now(), name, position, number, photo };
+            players.push(newPlayer);
+            activePlayerId = newPlayer.id;
+            localStorage.setItem('onecoin_active_player', activePlayerId);
+            saveState();
+            renderAllViews();
+            e.target.reset();
+            alert('¡Registro exitoso!');
+            switchTab('roster');
+        }
+
+        function createMatch(e) {
+            e.preventDefault();
+            const opponent = document.getElementById('match-opponent').value;
+            const date = document.getElementById('match-date').value;
+            const time = document.getElementById('match-time').value;
+            const location = document.getElementById('match-location').value;
+            matches.push({ id: 'm_' + Date.now(), opponent, date, time, location, rsvp: {}, finished: false });
+            saveState();
+            closeMatchModal();
+            e.target.reset();
+            alert('¡Partido programado!');
+        }
+
+        function renderSeasonBanner() {
+            document.getElementById('stat-record').textContent = `${matches.filter(m => m.finished && m.result === 'Ganado').length}V - ${matches.filter(m => m.finished && m.result === 'Perdido').length}D`;
+        }
+
+        window.onload = () => {
+            loadFromCloud();
+        };
+    </script>
+</body>
+</html>
