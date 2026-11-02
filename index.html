@@ -54,7 +54,7 @@
         .tab-pane.active-pane {
             display: block !important;
         }
-        /* Ocultar elementos exclusivos de jugador cuando está en modo espectador */
+        /* Ocultar elementos exclusivos de jugador en modo espectador */
         body.is-spectator .player-only {
             display: none !important;
         }
@@ -105,35 +105,4 @@
 
         <!-- NAVIGATION TABS -->
         <nav class="flex border-t border-slate-800/80 max-w-7xl mx-auto px-4 overflow-x-auto scrollbar-none text-xs font-bold">
-            <button type="button" data-target="roster" id="tab-roster" class="tab-btn px-4 py-3 text-orange-400 border-b-2 border-orange-500 flex items-center gap-2 whitespace-nowrap transition-colors">
-                <i class="fa-solid fa-users"></i> Plantilla (Roster)
-            </button>
-            <button type="button" data-target="matches" id="tab-matches" class="tab-btn px-4 py-3 text-slate-400 hover:text-slate-200 flex items-center gap-2 whitespace-nowrap transition-colors">
-                <i class="fa-solid fa-calendar-days"></i> Partidos & Asistencia
-            </button>
-            <button type="button" data-target="ratings" id="tab-ratings" class="tab-btn px-4 py-3 text-slate-400 hover:text-slate-200 flex items-center gap-2 whitespace-nowrap transition-colors">
-                <i class="fa-solid fa-star"></i> Valoraciones & Stats (1-10)
-            </button>
-            <button type="button" data-target="tactics" id="tab-tactics" class="tab-btn px-4 py-3 text-slate-400 hover:text-slate-200 flex items-center gap-2 whitespace-nowrap transition-colors">
-                <i class="fa-solid fa-chess-board"></i> Pizarra Táctica (2-3)
-            </button>
-            <button type="button" data-target="register" id="tab-register" class="player-only tab-btn px-4 py-3 text-slate-400 hover:text-slate-200 flex items-center gap-2 whitespace-nowrap transition-colors">
-                <i class="fa-solid fa-user-plus"></i> Registro
-            </button>
-        </nav>
-    </header>
-
-    <!-- SEASON METRICS BANNER -->
-    <section class="bg-slate-900/90 border-b border-slate-800/80 py-2.5">
-        <div class="max-w-7xl mx-auto px-4 grid grid-cols-2 md:grid-cols-4 gap-3 text-center text-xs">
-            <div class="bg-slate-950/50 p-2 rounded-xl border border-slate-800">
-                <span class="text-slate-400 text-[10px] uppercase font-bold block">Récord Temporada</span>
-                <span id="stat-record" class="text-white font-black text-sm">0V - 0D</span>
-            </div>
-            <div class="bg-slate-950/50 p-2 rounded-xl border border-slate-800">
-                <span class="text-slate-400 text-[10px] uppercase font-bold block">Racha Actual</span>
-                <span id="stat-streak" class="text-amber-400 font-black text-sm">--</span>
-            </div>
-            <div class="bg-slate-950/50 p-2 rounded-xl border border-slate-800">
-                <span class="text-slate-400 text-[10px] uppercase font-bold block">Máximo Anotador</span>
-                <span id="stat-top-scorer" class="text-emerald-400 font-black text-sm line-clamp-1
+            <button type="button" data-target="roster" id="tab-roster" class="tab-btn px-4 py-3 text-
