@@ -702,4 +702,389 @@
             document.getElementById('card-modal').classList.remove('hidden');
         }
 
-        function closeCardModal() { document
+        function closeCardModal() { document.getElementById('card-modal').classList.add('hidden'); }
+
+        function switchToEditCardMode() {
+            const p = players.find(x => x.id === activePlayerId);
+            if (!p) return;
+            document.getElementById('edit-player-id').value = p.id;
+            document.getElementById('edit-name').value = p.name;
+            document.getElementById('edit-position').value = p.position;
+            document.getElementById('edit-number').value = p.number;
+            document.getElementById('edit-height').value = p.height || '';
+            document.getElementById('edit-photo-preview').src = p.photo || 'https://placehold.co/100';
+            document.getElementById('edit-photo-hidden').value = p.photo || '';
+
+            document.getElementById('card-view-mode').classList.add('hidden');
+            document.getElementById('card-edit-mode').classList.remove('hidden');
+        }
+
+        function cancelEditCardMode() {
+            document.getElementById('card-edit-mode').classList.add('hidden');
+            document.getElementById('card-view-mode').classList.remove('hidden');
+        }
+
+        function saveEditedPlayer(e) {
+            e.preventDefault();
+            const id = document.getElementById('edit-player-id').value;
+            const name = document.getElementById('edit-name').value.trim();
+            const position = document.getElementById('edit-position').value;
+            const number = parseInt(document.getElementById('edit-number').value);
+            const height = document.getElementById('edit-height').value.trim();
+            const photo = document.getElementById('edit-photo-hidden').value || players.find(x => x.id === id).photo;
+
+            if (players.some(p => p.number === number && p.id !== id)) {
+                alert(`El jersey #${number} ya está ocupado.`);
+                return;
+            }
+
+            const index = players.findIndex(x => x.id === id);
+            if (index !== -1) {
+                players[index] = { ...players[index], name, position, number, height, photo };
+                saveState();
+                renderAllViews();
+                closeCardModal();
+                alert('¡Perfil actualizado con éxito!');
+            }
+        }
+
+        function renderRatingsTable() {
+            const tbody = document.getElementById('ratings-table-body');
+            if (!tbody) return;
+            tbody.innerHTML = '';
+
+            if (players.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="p-4 text-center text-slate-500">Sin datos</td></tr>';
+                return;
+            }
+
+            players.forEach(p => {
+                let totalGames = 0;
+                let totalPoints = 0;
+                let totalBlocks = 0;
+                let totalAssists = 0;
+                let totalRatingSum = 0;
+
+                matches.forEach(m => {
+                    if (m.stats && m.stats[p.id]) {
+                        totalGames++;
+                        totalPoints += Number(m.stats[p.id].points || 0);
+                        totalBlocks += Number(m.stats[p.id].blocks || 0);
+                        totalAssists += Number(m.stats[p.id].assists || 0);
+                        totalRatingSum += Number(m.stats[p.id].rating || 0);
+                    }
+                });
+
+                const avgRating = totalGames > 0 ? (totalRatingSum / totalGames).toFixed(1) : '--';
+
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-900/40">
+                        <td class="p-3 font-bold text-white flex items-center gap-2">
+                            <img src="${p.photo || 'https://placehold.co/100'}" class="w-6 h-6 rounded-full object-cover">
+                            ${p.name} (#${p.number})
+                        </td>
+                        <td class="p-3 text-center text-slate-400">${p.position}</td>
+                        <td class="p-3 text-center text-slate-300 font-bold">${totalGames}</td>
+                        <td class="p-3 text-center text-emerald-400 font-bold">${totalPoints}</td>
+                        <td class="p-3 text-center text-amber-400 font-bold">${totalBlocks}</td>
+                        <td class="p-3 text-center text-blue-400 font-bold">${totalAssists}</td>
+                        <td class="p-3 text-center text-orange-400 font-black">${avgRating}</td>
+                    </tr>
+                `;
+            });
+            renderSeasonBanner();
+        }
+
+        function populateTacticalSelects() {
+            ['ala1', 'centro', 'ala2', 'poste1', 'poste2'].forEach(slot => {
+                const sel = document.getElementById(`select-${slot}`);
+                if (!sel) return;
+                sel.innerHTML = '<option value="">-- Vacío --</option>';
+                players.forEach(p => {
+                    const selAttr = startingFive[slot] === p.id ? 'selected' : '';
+                    sel.innerHTML += `<option value="${p.id}" ${selAttr}>#${p.number} ${p.name}</option>`;
+                });
+                updateTacticalSlotVisual(slot, startingFive[slot]);
+            });
+        }
+
+        function updateTacticalSlotVisual(slot, playerId) {
+            const p = players.find(x => x.id === playerId);
+            const img = document.getElementById(`img-tactic-${slot}`);
+            const badge = document.getElementById(`badge-tactic-${slot}`);
+            if (p) {
+                if (img) img.src = p.photo || 'https://placehold.co/100';
+                if (badge) badge.textContent = `#${p.number}`;
+            } else {
+                if (img) img.src = `https://placehold.co/100x100/1e293b/f97316?text=${slot}`;
+                if (badge) badge.textContent = '#--';
+            }
+        }
+
+        function saveTactics() {
+            startingFive = {
+                ala1: document.getElementById('select-ala1').value,
+                centro: document.getElementById('select-centro').value,
+                ala2: document.getElementById('select-ala2').value,
+                poste1: document.getElementById('select-poste1').value,
+                poste2: document.getElementById('select-poste2').value
+            };
+            saveState();
+            alert('¡Quinteto guardado!');
+        }
+
+        function registerPlayer(e) {
+            e.preventDefault();
+            const name = document.getElementById('reg-name').value.trim();
+            const position = document.getElementById('reg-position').value;
+            const number = parseInt(document.getElementById('reg-number').value);
+            const height = document.getElementById('reg-height').value.trim();
+            const photo = document.getElementById('reg-photo-hidden').value || 'https://placehold.co/100x100/1e293b/f97316?text=' + encodeURIComponent(name);
+
+            if (players.some(p => p.number === number)) {
+                alert(`El jersey #${number} ya pertenece a otro jugador.`);
+                return;
+            }
+
+            const newPlayer = { id: 'p_' + Date.now(), name, position, number, height, photo };
+            players.push(newPlayer);
+            activePlayerId = newPlayer.id;
+            localStorage.setItem('onecoin_active_player', activePlayerId);
+            saveState();
+            renderAllViews();
+            e.target.reset();
+            document.getElementById('reg-photo-preview').src = 'https://placehold.co/100x100/1e293b/f97316?text=Foto';
+            alert('¡Registro exitoso!');
+            switchTab('roster');
+        }
+
+        function createMatch(e) {
+            e.preventDefault();
+            const opponent = document.getElementById('match-opponent').value;
+            const date = document.getElementById('match-date').value;
+            const time = document.getElementById('match-time').value;
+            const location = document.getElementById('match-location').value;
+            matches.push({ id: 'm_' + Date.now(), opponent, date, time, location, rsvp: {}, stats: {} });
+            saveState();
+            closeMatchModal();
+            renderMatches();
+            e.target.reset();
+            alert('¡Partido programado!');
+        }
+
+        function deleteMatch(matchId) {
+            if (!isPlayerLoggedIn) {
+                alert('Inicia sesión como jugador para borrar partidos.');
+                return;
+            }
+            if (confirm('¿Estás seguro de eliminar este partido?')) {
+                matches = matches.filter(m => m.id !== matchId);
+                saveState();
+                renderMatches();
+                renderRatingsTable();
+                renderSeasonBanner();
+            }
+        }
+
+        function voteRsvp(matchId, status) {
+            if (!isPlayerLoggedIn || !activePlayerId) {
+                alert('Selecciona tu identidad activa e inicia sesión para votar.');
+                return;
+            }
+            const match = matches.find(m => m.id === matchId);
+            if (match) {
+                if (!match.rsvp) match.rsvp = {};
+                match.rsvp[activePlayerId] = status;
+                saveState();
+                renderMatches();
+            }
+        }
+
+        function openStatsModal(matchId) {
+            if (!isPlayerLoggedIn || !activePlayerId) {
+                alert('Inicia sesión y selecciona tu identidad.');
+                return;
+            }
+            const match = matches.find(m => m.id === matchId);
+            if (!match) return;
+
+            const myRsvp = match.rsvp && match.rsvp[activePlayerId];
+            if (myRsvp !== 'yes') {
+                alert('Solo los jugadores que confirmaron asistencia ("Sí voy") pueden registrar sus estadísticas en este partido.');
+                return;
+            }
+
+            document.getElementById('stats-match-id').value = matchId;
+            document.getElementById('stats-modal-subtitle').textContent = `Partido vs ${match.opponent} (${match.date})`;
+
+            const existingStats = match.stats && match.stats[activePlayerId];
+            if (existingStats) {
+                document.getElementById('stat-points').value = existingStats.points || 0;
+                document.getElementById('stat-blocks').value = existingStats.blocks || 0;
+                document.getElementById('stat-assists').value = existingStats.assists || 0;
+                document.getElementById('stat-rating').value = existingStats.rating || 8;
+            } else {
+                document.getElementById('stat-points').value = 0;
+                document.getElementById('stat-blocks').value = 0;
+                document.getElementById('stat-assists').value = 0;
+                document.getElementById('stat-rating').value = 8;
+            }
+
+            document.getElementById('stats-modal').classList.remove('hidden');
+        }
+
+        function closeStatsModal() {
+            document.getElementById('stats-modal').classList.add('hidden');
+        }
+
+        function savePlayerStats(e) {
+            e.preventDefault();
+            const matchId = document.getElementById('stats-match-id').value;
+            const match = matches.find(m => m.id === matchId);
+            if (!match) return;
+
+            if (!match.stats) match.stats = {};
+            match.stats[activePlayerId] = {
+                points: parseInt(document.getElementById('stat-points').value) || 0,
+                blocks: parseInt(document.getElementById('stat-blocks').value) || 0,
+                assists: parseInt(document.getElementById('stat-assists').value) || 0,
+                rating: parseInt(document.getElementById('stat-rating').value) || 1
+            };
+
+            saveState();
+            closeStatsModal();
+            renderRatingsTable();
+            renderMatches();
+            renderSeasonBanner();
+            alert('¡Estadísticas guardadas con éxito!');
+        }
+
+        function renderMatches() {
+            const container = document.getElementById('matches-list');
+            if (!container) return;
+            container.innerHTML = '';
+
+            if (matches.length === 0) {
+                container.innerHTML = '<div class="glass-panel p-6 rounded-2xl border border-slate-800 text-center text-slate-500 text-xs">No hay partidos programados.</div>';
+                return;
+            }
+
+            matches.forEach(m => {
+                let yesList = [];
+                let noList = [];
+                let maybeList = [];
+
+                if (m.rsvp) {
+                    Object.keys(m.rsvp).forEach(pId => {
+                        const playerObj = players.find(p => p.id === pId);
+                        if (playerObj) {
+                            if (m.rsvp[pId] === 'yes') yesList.push(playerObj.name);
+                            if (m.rsvp[pId] === 'no') noList.push(playerObj.name);
+                            if (m.rsvp[pId] === 'maybe') maybeList.push(playerObj.name);
+                        }
+                    });
+                }
+
+                const myCurrentVote = (m.rsvp && activePlayerId) ? m.rsvp[activePlayerId] : null;
+                const iAmGoing = myCurrentVote === 'yes';
+                const hasRated = (m.stats && activePlayerId && m.stats[activePlayerId]);
+
+                const card = document.createElement('div');
+                card.className = "glass-panel p-5 rounded-2xl border border-slate-800 space-y-4 shadow-xl";
+                card.innerHTML = `
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                        <div>
+                            <span class="text-orange-400 font-bold text-xs"><i class="fa-solid fa-calendar-day"></i> ${m.date} - ${m.time}</span>
+                            <h3 class="font-black text-white text-base">vs ${m.opponent}</h3>
+                            <p class="text-xs text-slate-400"><i class="fa-solid fa-location-dot"></i> ${m.location}</p>
+                        </div>
+                        <div class="player-only flex items-center gap-2 w-full sm:w-auto justify-end">
+                            <button type="button" onclick="deleteMatch('${m.id}')" class="bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 text-xs font-bold px-3 py-2 rounded-xl transition cursor-pointer flex items-center gap-1.5">
+                                <i class="fa-solid fa-trash"></i> Borrar
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Votación de Asistencia -->
+                    <div class="bg-slate-900/80 p-3 rounded-xl border border-slate-800 space-y-3">
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                            <span class="text-xs font-bold text-slate-300 uppercase"><i class="fa-solid fa-check-to-slot text-orange-400"></i> Encuesta de Asistencia</span>
+                            <div class="player-only flex gap-1.5 w-full sm:w-auto">
+                                <button type="button" onclick="voteRsvp('${m.id}', 'yes')" class="flex-1 sm:flex-initial px-3 py-1 rounded-lg text-xs font-bold transition cursor-pointer ${myCurrentVote === 'yes' ? 'bg-emerald-600 text-white shadow-lg' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'}">Sí voy</button>
+                                <button type="button" onclick="voteRsvp('${m.id}', 'no')" class="flex-1 sm:flex-initial px-3 py-1 rounded-lg text-xs font-bold transition cursor-pointer ${myCurrentVote === 'no' ? 'bg-red-600 text-white shadow-lg' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'}">No voy</button>
+                                <button type="button" onclick="voteRsvp('${m.id}', 'maybe')" class="flex-1 sm:flex-initial px-3 py-1 rounded-lg text-xs font-bold transition cursor-pointer ${myCurrentVote === 'maybe' ? 'bg-amber-600 text-white shadow-lg' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'}">Tal vez</button>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs pt-1 border-t border-slate-800/60">
+                            <div><span class="text-emerald-400 font-bold">🟢 Sí (${yesList.length}):</span> <span class="text-slate-400">${yesList.length > 0 ? yesList.join(', ') : 'Nadie'}</span></div>
+                            <div><span class="text-red-400 font-bold">🔴 No (${noList.length}):</span> <span class="text-slate-400">${noList.length > 0 ? noList.join(', ') : 'Nadie'}</span></div>
+                            <div><span class="text-amber-400 font-bold">🟡 Tal vez (${maybeList.length}):</span> <span class="text-slate-400">${maybeList.length > 0 ? maybeList.join(', ') : 'Nadie'}</span></div>
+                        </div>
+                    </div>
+
+                    <!-- Botón para registrar estadísticas (Solo si votó que sí) -->
+                    <div class="player-only pt-1">
+                        ${iAmGoing ? `
+                            <button type="button" onclick="openStatsModal('${m.id}')" class="w-full bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-600 text-white font-extrabold text-xs py-2.5 rounded-xl shadow-lg transition cursor-pointer flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-basketball"></i> ${hasRated ? 'Editar mis Estadísticas de este Partido' : 'Registrar mis Puntos, Tapones y Asistencias'}
+                            </button>
+                        ` : `
+                            <p class="text-[11px] text-slate-500 text-center italic">Marca "Sí voy" en la encuesta de asistencia para habilitar el registro de tus estadísticas de este partido.</p>
+                        `}
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function renderSeasonBanner() {
+            let topScorerName = '--';
+            let maxPts = -1;
+            let mvpName = '--';
+            let maxRating = -1;
+
+            players.forEach(p => {
+                let pPts = 0;
+                let pRatingSum = 0;
+                let pGames = 0;
+
+                matches.forEach(m => {
+                    if (m.stats && m.stats[p.id]) {
+                        pPts += Number(m.stats[p.id].points || 0);
+                        pRatingSum += Number(m.stats[p.id].rating || 0);
+                        pGames++;
+                    }
+                });
+
+                if (pPts > maxPts && pPts > 0) {
+                    maxPts = pPts;
+                    topScorerName = `${p.name} (${pPts} pts)`;
+                }
+
+                if (pGames > 0) {
+                    let avg = pRatingSum / pGames;
+                    if (avg > maxRating) {
+                        maxRating = avg;
+                        mvpName = `${p.name} (${avg.toFixed(1)})`;
+                    }
+                }
+            });
+
+            const recordEl = document.getElementById('stat-record');
+            if (recordEl) {
+                const won = matches.filter(m => m.finished && m.result === 'Ganado').length;
+                const lost = matches.filter(m => m.finished && m.result === 'Perdido').length;
+                recordEl.textContent = `${won}V - ${lost}D`;
+            }
+
+            const topScorerEl = document.getElementById('stat-top-scorer');
+            const mvpEl = document.getElementById('stat-mvp');
+            if (topScorerEl) topScorerEl.textContent = topScorerName;
+            if (mvpEl) mvpEl.textContent = mvpName;
+        }
+
+        window.onload = () => { loadFromCloud(); };
+    </script>
+</body>
+</html>
