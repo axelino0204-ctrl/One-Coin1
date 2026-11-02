@@ -1,0 +1,911 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>One Coin Basketball - Gestión de Equipo</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#fff7ed',
+                            100: '#ffedd5',
+                            500: '#f97316',
+                            600: '#ea580c',
+                            700: '#c2410c',
+                            900: '#7c2d12',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0b0f19;
+            color: #f3f4f6;
+        }
+        .court-bg {
+            background-color: #1e293b;
+            background-image: radial-gradient(#334155 1px, transparent 1px);
+            background-size: 16px 16px;
+        }
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between antialiased selection:bg-orange-500 selection:text-white">
+
+    <!-- TOP HEADER -->
+    <header class="sticky top-0 z-40 border-b border-slate-800 glass-panel shadow-2xl">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('roster')">
+                <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-orange-500 to-amber-600 flex items-center justify-center text-white shadow-lg shadow-orange-500/30">
+                    <i class="fa-solid fa-basketball text-xl animate-pulse"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-black tracking-tight text-white uppercase flex items-center gap-2">
+                        ONE COIN <span class="text-xs px-2 py-0.5 rounded bg-orange-500/20 text-orange-400 border border-orange-500/30">BASKETBALL</span>
+                    </h1>
+                    <p class="text-[11px] text-slate-400 font-medium">Panel de Control & Valoración de Jugadores</p>
+                </div>
+            </div>
+
+            <!-- Active User Profile / Switcher -->
+            <div class="flex items-center gap-3">
+                <div id="active-user-badge" class="hidden sm:flex items-center gap-2 bg-slate-900 border border-slate-800 px-3 py-1.5 rounded-full shadow-inner cursor-pointer hover:border-orange-500/50 transition" onclick="switchTab('register')">
+                    <img id="active-user-avatar" src="" class="w-6 h-6 rounded-full object-cover border border-orange-500">
+                    <span id="active-user-name" class="text-xs font-bold text-slate-200">Jugador</span>
+                    <i class="fa-solid fa-pen text-[10px] text-orange-400"></i>
+                </div>
+                <button onclick="openInviteModal()" class="bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-extrabold text-xs px-3.5 py-2 rounded-xl shadow-lg shadow-orange-500/20 flex items-center gap-2 transition active:scale-95">
+                    <i class="fa-solid fa-user-plus"></i> <span class="hidden md:inline">Invitar Jugadores</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- NAVIGATION TABS -->
+        <nav class="flex border-t border-slate-800/80 max-w-7xl mx-auto px-4 overflow-x-auto scrollbar-none text-xs font-bold">
+            <button onclick="switchTab('roster')" id="tab-roster" class="tab-btn px-4 py-3 text-orange-400 border-b-2 border-orange-500 flex items-center gap-2 whitespace-nowrap">
+                <i class="fa-solid fa-users"></i> Plantilla (Roster)
+            </button>
+            <button onclick="switchTab('matches')" id="tab-matches" class="tab-btn px-4 py-3 text-slate-400 hover:text-slate-200 flex items-center gap-2 whitespace-nowrap">
+                <i class="fa-solid fa-calendar-days"></i> Partidos & Asistencia
+            </button>
+            <button onclick="switchTab('ratings')" id="tab-ratings" class="tab-btn px-4 py-3 text-slate-400 hover:text-slate-200 flex items-center gap-2 whitespace-nowrap">
+                <i class="fa-solid fa-star"></i> Valoraciones & Stats (1-10)
+            </button>
+            <button onclick="switchTab('tactics')" id="tab-tactics" class="tab-btn px-4 py-3 text-slate-400 hover:text-slate-200 flex items-center gap-2 whitespace-nowrap">
+                <i class="fa-solid fa-chess-board"></i> Pizarra Táctica (2-3)
+            </button>
+            <button onclick="switchTab('register')" id="tab-register" class="tab-btn px-4 py-3 text-slate-400 hover:text-slate-200 flex items-center gap-2 whitespace-nowrap">
+                <i class="fa-solid fa-user-plus"></i> Registro
+            </button>
+        </nav>
+    </header>
+
+    <!-- SEASON METRICS BANNER -->
+    <section class="bg-slate-900/90 border-b border-slate-800/80 py-2.5">
+        <div class="max-w-7xl mx-auto px-4 grid grid-cols-2 md:grid-cols-4 gap-3 text-center text-xs">
+            <div class="bg-slate-950/50 p-2 rounded-xl border border-slate-800">
+                <span class="text-slate-400 text-[10px] uppercase font-bold block">Récord Temporada</span>
+                <span id="stat-record" class="text-white font-black text-sm">0V - 0D</span>
+            </div>
+            <div class="bg-slate-950/50 p-2 rounded-xl border border-slate-800">
+                <span class="text-slate-400 text-[10px] uppercase font-bold block">Racha Actual</span>
+                <span id="stat-streak" class="text-amber-400 font-black text-sm">--</span>
+            </div>
+            <div class="bg-slate-950/50 p-2 rounded-xl border border-slate-800">
+                <span class="text-slate-400 text-[10px] uppercase font-bold block">Máximo Anotador</span>
+                <span id="stat-top-scorer" class="text-emerald-400 font-black text-sm line-clamp-1">--</span>
+            </div>
+            <div class="bg-slate-950/50 p-2 rounded-xl border border-slate-800">
+                <span class="text-slate-400 text-[10px] uppercase font-bold block">Mejor Valorado (MVP)</span>
+                <span id="stat-mvp" class="text-orange-400 font-black text-sm line-clamp-1">--</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- MAIN CONTENT CONTAINERS -->
+    <main class="max-w-7xl mx-auto px-4 py-6 flex-grow w-full">
+
+        <!-- TAB 1: PLANTILLA / ROSTER -->
+        <section id="view-roster" class="tab-content space-y-6">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-slate-900/60 p-4 rounded-2xl border border-slate-800">
+                <div>
+                    <h2 class="text-lg font-black text-white flex items-center gap-2">
+                        <span>Jugadores de One Coin</span>
+                        <span id="player-count-badge" class="bg-orange-500 text-white text-xs px-2 py-0.5 rounded-full font-bold">0</span>
+                    </h2>
+                    <p class="text-xs text-slate-400">Filtrar por posición táctica (Poste, Centro, Ala)</p>
+                </div>
+                <!-- Filters -->
+                <div class="flex flex-wrap gap-1.5">
+                    <button onclick="filterPosition('All')" class="pos-filter-btn px-3 py-1.5 rounded-lg bg-orange-600 text-white font-bold text-xs shadow-md">Todos</button>
+                    <button onclick="filterPosition('Centro')" class="pos-filter-btn px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 border border-slate-700 text-xs hover:border-slate-500">Centro</button>
+                    <button onclick="filterPosition('Ala')" class="pos-filter-btn px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 border border-slate-700 text-xs hover:border-slate-500">Ala</button>
+                    <button onclick="filterPosition('Poste')" class="pos-filter-btn px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 border border-slate-700 text-xs hover:border-slate-500">Poste</button>
+                </div>
+            </div>
+
+            <!-- Roster Grid -->
+            <div id="roster-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                <!-- Dynamic Player Cards -->
+            </div>
+        </section>
+
+        <!-- TAB 2: PARTIDOS & ASISTENCIA -->
+        <section id="view-matches" class="tab-content hidden space-y-6">
+            <div class="flex justify-between items-center bg-slate-900/60 p-4 rounded-2xl border border-slate-800">
+                <div>
+                    <h2 class="text-lg font-black text-white">Calendario de Partidos</h2>
+                    <p class="text-xs text-slate-400">Votación de asistencia y reportes de partido</p>
+                </div>
+                <button onclick="openMatchModal()" class="bg-orange-500 hover:bg-orange-600 text-white font-bold text-xs px-4 py-2 rounded-xl flex items-center gap-2 shadow-lg shadow-orange-500/20">
+                    <i class="fa-solid fa-plus"></i> Programar Partido
+                </button>
+            </div>
+
+            <div id="matches-list" class="space-y-4">
+                <!-- Dynamic Matches -->
+            </div>
+        </section>
+
+        <!-- TAB 3: VALORACIONES & STATS -->
+        <section id="view-ratings" class="tab-content hidden space-y-6">
+            <div class="bg-slate-900/60 p-4 rounded-2xl border border-slate-800">
+                <h2 class="text-lg font-black text-white">Tabla de Valoraciones y Estadísticas Acumuladas</h2>
+                <p class="text-xs text-slate-400">Escala de 1 a 10 basada en desempeño en partidos asistidos</p>
+            </div>
+
+            <div class="overflow-x-auto glass-panel rounded-2xl border border-slate-800 shadow-xl">
+                <table class="w-full text-left text-xs">
+                    <thead class="bg-slate-900 text-slate-400 uppercase font-bold border-b border-slate-800">
+                        <tr>
+                            <th class="p-3">Jugador</th>
+                            <th class="p-3 text-center">Posición</th>
+                            <th class="p-3 text-center">PJ</th>
+                            <th class="p-3 text-center">Pts (PPP)</th>
+                            <th class="p-3 text-center">Tap (TPP)</th>
+                            <th class="p-3 text-center">Ast (APP)</th>
+                            <th class="p-3 text-center">Tiro</th>
+                            <th class="p-3 text-center">Defensa</th>
+                            <th class="p-3 text-center">Pase</th>
+                            <th class="p-3 text-center">Equipo</th>
+                            <th class="p-3 text-center">Promedio</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ratings-table-body" class="divide-y divide-slate-800/50">
+                        <!-- Dynamic Rating Rows -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- TAB 4: PIZARRA TÁCTICA 2-3 -->
+        <section id="view-tactics" class="tab-content hidden space-y-6">
+            <div class="bg-slate-900/60 p-4 rounded-2xl border border-slate-800 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div>
+                    <h2 class="text-lg font-black text-white">Formación Táctica 2-3 (Quinteto Titular)</h2>
+                    <p class="text-xs text-slate-400">3 Perímetro (Centro y 2 Alas) + 2 Pintura (Postes)</p>
+                </div>
+                <button onclick="saveStartingFive()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs px-4 py-2 rounded-xl shadow-lg shadow-emerald-600/20">
+                    <i class="fa-solid fa-floppy-disk"></i> Guardar Quinteto
+                </button>
+            </div>
+
+            <!-- Court Visualizer -->
+            <div class="court-bg border border-slate-700 rounded-3xl p-6 min-h-[460px] relative flex flex-col justify-between shadow-2xl">
+                
+                <!-- TOP 3 PERIMETER (Centro, Ala 1, Ala 2) -->
+                <div class="grid grid-cols-3 gap-4 text-center z-10 pt-2">
+                    <!-- Ala 1 -->
+                    <div class="flex flex-col items-center">
+                        <span class="text-[10px] font-extrabold text-orange-400 bg-slate-900/90 px-2 py-0.5 rounded border border-orange-500/30 uppercase mb-1">Ala 1 (Perímetro)</span>
+                        <select id="select-ala1" class="bg-slate-900 text-slate-200 text-xs font-bold p-2 rounded-xl border border-slate-700 w-full max-w-[160px] text-center shadow-lg focus:border-orange-500">
+                            <!-- Options -->
+                        </select>
+                    </div>
+                    <!-- Centro / Base -->
+                    <div class="flex flex-col items-center">
+                        <span class="text-[10px] font-extrabold text-amber-400 bg-slate-900/90 px-2 py-0.5 rounded border border-amber-500/30 uppercase mb-1">Centro / Organizador</span>
+                        <select id="select-centro" class="bg-slate-900 text-slate-200 text-xs font-bold p-2 rounded-xl border border-slate-700 w-full max-w-[160px] text-center shadow-lg focus:border-orange-500">
+                            <!-- Options -->
+                        </select>
+                    </div>
+                    <!-- Ala 2 -->
+                    <div class="flex flex-col items-center">
+                        <span class="text-[10px] font-extrabold text-orange-400 bg-slate-900/90 px-2 py-0.5 rounded border border-orange-500/30 uppercase mb-1">Ala 2 (Perímetro)</span>
+                        <select id="select-ala2" class="bg-slate-900 text-slate-200 text-xs font-bold p-2 rounded-xl border border-slate-700 w-full max-w-[160px] text-center shadow-lg focus:border-orange-500">
+                            <!-- Options -->
+                        </select>
+                    </div>
+                </div>
+
+                <!-- KEY PAINT AREA (Decorative Rim) -->
+                <div class="self-center my-6 border-2 border-slate-600/50 w-48 h-32 rounded-b-3xl relative flex items-center justify-center bg-orange-500/5">
+                    <div class="w-12 h-12 rounded-full border border-orange-500/40"></div>
+                </div>
+
+                <!-- BOTTOM 2 INSIDE (Poste 1, Poste 2) -->
+                <div class="grid grid-cols-2 gap-12 text-center z-10 pb-2 max-w-lg mx-auto w-full">
+                    <!-- Poste 1 -->
+                    <div class="flex flex-col items-center">
+                        <span class="text-[10px] font-extrabold text-emerald-400 bg-slate-900/90 px-2 py-0.5 rounded border border-emerald-500/30 uppercase mb-1">Poste 1 (Interior)</span>
+                        <select id="select-poste1" class="bg-slate-900 text-slate-200 text-xs font-bold p-2 rounded-xl border border-slate-700 w-full text-center shadow-lg focus:border-orange-500">
+                            <!-- Options -->
+                        </select>
+                    </div>
+                    <!-- Poste 2 -->
+                    <div class="flex flex-col items-center">
+                        <span class="text-[10px] font-extrabold text-emerald-400 bg-slate-900/90 px-2 py-0.5 rounded border border-emerald-500/30 uppercase mb-1">Poste 2 (Interior)</span>
+                        <select id="select-poste2" class="bg-slate-900 text-slate-200 text-xs font-bold p-2 rounded-xl border border-slate-700 w-full text-center shadow-lg focus:border-orange-500">
+                            <!-- Options -->
+                        </select>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- TAB 5: REGISTRO DE JUGADORES -->
+        <section id="view-register" class="tab-content hidden space-y-6 max-w-2xl mx-auto">
+            <!-- Welcome Invitation Alert -->
+            <div id="invite-banner" class="hidden bg-gradient-to-r from-orange-600 to-amber-600 p-4 rounded-2xl text-white shadow-xl flex items-center gap-3">
+                <i class="fa-solid fa-envelope-open-text text-2xl"></i>
+                <div>
+                    <h3 class="font-bold text-sm">¡Has sido invitado al equipo One Coin!</h3>
+                    <p class="text-xs text-orange-100">Completa tu registro a continuación para unirte oficialmente a la plantilla.</p>
+                </div>
+            </div>
+
+            <div class="glass-panel p-6 rounded-3xl border border-slate-800 shadow-2xl">
+                <h2 class="text-xl font-black text-white mb-1">Registro de Nuevo Jugador</h2>
+                <p class="text-xs text-slate-400 mb-6">Completa tus datos personales para unirte a la plantilla activa.</p>
+
+                <form id="form-register-player" onsubmit="handlePlayerSubmit(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-300 uppercase mb-1">Nombre Completo / Apodo *</label>
+                        <input type="text" id="reg-name" required placeholder="ej. Carlos 'El Rayo' López" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-sm text-white focus:border-orange-500 focus:ring-1 focus:ring-orange-500 outline-none">
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-300 uppercase mb-1">Posición Principal *</label>
+                            <select id="reg-position" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-sm text-white focus:border-orange-500 outline-none">
+                                <option value="Centro">Centro (Base/Guardia)</option>
+                                <option value="Ala">Ala (Escolta/Alero)</option>
+                                <option value="Poste">Poste (Ala-Pívot/Pívot)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-300 uppercase mb-1">Número de Jersey *</label>
+                            <input type="number" id="reg-number" required min="0" max="99" placeholder="7" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-sm text-white focus:border-orange-500 outline-none">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-300 uppercase mb-1">Estatura</label>
+                            <input type="text" id="reg-height" placeholder="ej. 1.85m" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-sm text-white focus:border-orange-500 outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-300 uppercase mb-1">Teléfono (Contacto)</label>
+                            <input type="tel" id="reg-phone" placeholder="+52 ..." class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-sm text-white focus:border-orange-500 outline-none">
+                        </div>
+                    </div>
+
+                    <!-- Profile Photo Selection -->
+                    <div>
+                        <label class="block text-xs font-bold text-slate-300 uppercase mb-1">Foto de Perfil</label>
+                        <div class="flex items-center space-x-4">
+                            <img id="reg-photo-preview" src="https://placehold.co/100x100/1e293b/f97316?text=Perfil" class="w-14 h-14 rounded-2xl object-cover border border-slate-700">
+                            <div class="flex-grow space-y-2">
+                                <input type="file" accept="image/*" onchange="handleImageUpload(event, 'reg-photo-preview', 'reg-photo-url')" class="block w-full text-xs text-slate-400 file:mr-2 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-slate-800 file:text-slate-200 hover:file:bg-slate-700 cursor-pointer">
+                                <input type="text" id="reg-photo-url" placeholder="o pega una URL de imagen..." class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2 text-xs text-white focus:border-orange-500 outline-none">
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="w-full bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700 text-white font-extrabold text-sm py-3.5 rounded-xl shadow-lg shadow-orange-500/20 transition mt-4">
+                        <i class="fa-solid fa-circle-check"></i> Completar Registro en One Coin
+                    </button>
+                </form>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="border-t border-slate-800/80 bg-slate-950 py-4 text-center text-xs text-slate-500">
+        <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-2">
+            <span>&copy; 2026 One Coin Basketball Team. Todos los derechos reservados.</span>
+            <div class="flex gap-4 text-slate-400">
+                <span class="hover:text-white cursor-pointer" onclick="openInviteModal()"><i class="fa-solid fa-link"></i> Enlace de Invitación</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- MODAL 1: INVITACIÓN -->
+    <div id="invite-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="glass-panel border border-slate-800 rounded-3xl p-6 max-w-md w-full shadow-2xl relative space-y-4">
+            <button onclick="closeInviteModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-lg"><i class="fa-solid fa-xmark"></i></button>
+            <div class="text-center space-y-2">
+                <div class="w-12 h-12 bg-orange-500/20 rounded-2xl text-orange-400 flex items-center justify-center mx-auto text-xl border border-orange-500/30">
+                    <i class="fa-solid fa-user-plus"></i>
+                </div>
+                <h3 class="text-lg font-black text-white">Enlace de Invitación al Equipo</h3>
+                <p class="text-xs text-slate-400">Comparte este enlace con tus compañeros para que registren sus fichas de jugador.</p>
+            </div>
+
+            <div class="space-y-2">
+                <input type="text" id="invite-url-input" readonly class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-xs text-orange-400 font-mono text-center outline-none">
+                <div class="grid grid-cols-2 gap-2">
+                    <button onclick="copyInviteLink()" class="bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs py-2.5 rounded-xl border border-slate-700 transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-copy"></i> Copiar Enlace
+                    </button>
+                    <button onclick="shareWhatsAppInvite()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs py-2.5 rounded-xl transition flex items-center justify-center gap-2">
+                        <i class="fa-brands fa-whatsapp"></i> WhatsApp
+                    </button>
+                </div>
+            </div>
+
+            <div class="pt-2 border-t border-slate-800/80 text-center">
+                <button onclick="closeInviteModal(); triggerInviteFlow();" class="text-xs text-orange-400 hover:underline font-bold">
+                    ⚡ Probar Flujo de Invitación Ahora (Modo Prueba)
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 2: CREAR PARTIDO -->
+    <div id="match-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="glass-panel border border-slate-800 rounded-3xl p-6 max-w-md w-full shadow-2xl relative space-y-4">
+            <button onclick="closeMatchModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-lg"><i class="fa-solid fa-xmark"></i></button>
+            <h3 class="text-lg font-black text-white">Programar Nuevo Partido</h3>
+
+            <form onsubmit="handleCreateMatch(event)" class="space-y-3">
+                <div>
+                    <label class="block text-xs font-bold text-slate-300 uppercase mb-1">Rival / Opponent *</label>
+                    <input type="text" id="match-opponent" required placeholder="ej. Club Titanes" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white focus:border-orange-500 outline-none">
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-300 uppercase mb-1">Fecha *</label>
+                        <input type="date" id="match-date" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white focus:border-orange-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-300 uppercase mb-1">Hora *</label>
+                        <input type="time" id="match-time" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white focus:border-orange-500 outline-none">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-300 uppercase mb-1">Lugar / Cancha *</label>
+                    <input type="text" id="match-location" required placeholder="ej. Cancha Municipal #2" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white focus:border-orange-500 outline-none">
+                </div>
+
+                <button type="submit" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-extrabold text-xs py-3 rounded-xl shadow-lg shadow-orange-500/20 transition">
+                    Guardar Partido
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL 3: FICHA COLECCIONABLE DEL JUGADOR -->
+    <div id="card-modal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-gradient-to-b from-slate-900 to-slate-950 border-2 border-orange-500/60 rounded-3xl p-6 max-w-sm w-full shadow-2xl relative text-center space-y-4">
+            <button onclick="closeCardModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-lg"><i class="fa-solid fa-xmark"></i></button>
+            
+            <div class="relative inline-block mt-2">
+                <img id="card-photo" src="" class="w-28 h-28 rounded-full object-cover border-4 border-orange-500 mx-auto shadow-2xl">
+                <span id="card-number" class="absolute -bottom-2 right-0 bg-orange-500 text-white font-black text-sm px-2.5 py-0.5 rounded-full shadow-md">#0</span>
+            </div>
+
+            <div>
+                <h3 id="card-name" class="text-xl font-black text-white">Nombre</h3>
+                <p id="card-position" class="text-xs text-orange-400 font-bold uppercase">Posición</p>
+                <p id="card-height" class="text-[11px] text-slate-400">Estatura</p>
+            </div>
+
+            <div class="grid grid-cols-3 gap-2 bg-slate-900/80 p-3 rounded-2xl border border-slate-800 text-center text-xs">
+                <div>
+                    <span class="text-slate-500 block text-[10px] uppercase font-bold">PPP</span>
+                    <span id="card-ppp" class="font-black text-white text-sm">0.0</span>
+                </div>
+                <div>
+                    <span class="text-slate-500 block text-[10px] uppercase font-bold">TPP</span>
+                    <span id="card-tpp" class="font-black text-white text-sm">0.0</span>
+                </div>
+                <div>
+                    <span class="text-slate-500 block text-[10px] uppercase font-bold">APP</span>
+                    <span id="card-app" class="font-black text-white text-sm">0.0</span>
+                </div>
+            </div>
+
+            <div class="bg-slate-900/60 p-3 rounded-2xl border border-slate-800 text-left text-xs space-y-1">
+                <div class="flex justify-between">
+                    <span class="text-slate-400">Promedio General:</span>
+                    <span id="card-rating" class="text-amber-400 font-bold">0.0 ⭐</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-slate-400">Partidos Jugados:</span>
+                    <span id="card-pj" class="text-white font-bold">0</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN JAVASCRIPT LOGIC -->
+    <script>
+        // Clean Initial State for Production
+        let players = [];
+        let matches = [];
+        let ratings = [];
+        let startingFive = { ala1: '', centro: '', ala2: '', poste1: '', poste2: '' };
+        let activePlayerId = null;
+        let currentPosFilter = 'All';
+
+        // Local Storage Helpers
+        function saveState() {
+            localStorage.setItem('onecoin_players_v5', JSON.stringify(players));
+            localStorage.setItem('onecoin_matches_v5', JSON.stringify(matches));
+            localStorage.setItem('onecoin_starting_five_v5', JSON.stringify(startingFive));
+            if (activePlayerId) localStorage.setItem('onecoin_active_player_id', activePlayerId);
+        }
+
+        // Navigation Switcher
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.className = 'tab-btn px-4 py-3 text-slate-400 hover:text-slate-200 flex items-center gap-2 whitespace-nowrap';
+            });
+
+            const activeView = document.getElementById(`view-${tabId}`);
+            const activeTabBtn = document.getElementById(`tab-${tabId}`);
+            if (activeView) activeView.classList.remove('hidden');
+            if (activeTabBtn) activeTabBtn.className = 'tab-btn px-4 py-3 text-orange-400 border-b-2 border-orange-500 flex items-center gap-2 whitespace-nowrap';
+        }
+
+        // Invitation Modal Controls
+        function openInviteModal() {
+            const modal = document.getElementById('invite-modal');
+            const input = document.getElementById('invite-url-input');
+            if (modal && input) {
+                input.value = getInviteUrl();
+                modal.classList.remove('hidden');
+            }
+        }
+
+        function closeInviteModal() {
+            const modal = document.getElementById('invite-modal');
+            if (modal) modal.classList.add('hidden');
+        }
+
+        function getInviteUrl() {
+            let base = window.location.href.split('#')[0].split('?')[0];
+            return `${base}?invite=true#register`;
+        }
+
+        function copyInviteLink() {
+            const input = document.getElementById('invite-url-input');
+            if (!input) return;
+            input.select();
+            
+            let copied = false;
+            try {
+                copied = document.execCommand('copy');
+            } catch(e) { copied = false; }
+
+            if (copied) {
+                alert('¡Enlace de invitación copiado al portapapeles!');
+            } else {
+                alert('Selecciona y copia la dirección del enlace.');
+            }
+        }
+
+        function shareWhatsAppInvite() {
+            const url = getInviteUrl();
+            const text = encodeURIComponent(`🏀 ¡Únete al equipo oficial de One Coin Basketball! Registra tu ficha de jugador aquí:\n${url}`);
+            window.open(`https://api.whatsapp.com/send?text=${text}`, '_blank');
+        }
+
+        function triggerInviteFlow() {
+            switchTab('register');
+            const banner = document.getElementById('invite-banner');
+            if (banner) banner.classList.remove('hidden');
+            setTimeout(() => {
+                const input = document.getElementById('reg-name');
+                if (input) input.focus();
+            }, 100);
+        }
+
+        function checkInviteLinkAndDirect() {
+            const href = String(window.location.href).toLowerCase();
+            if (href.includes('invite') || href.includes('register')) {
+                triggerInviteFlow();
+            }
+        }
+
+        // Image Preview Handler
+        function handleImageUpload(event, previewId, urlInputId) {
+            const file = event.target.files && event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const prev = document.getElementById(previewId);
+                    if (prev) prev.src = e.target.result;
+                    if (urlInputId) {
+                        const urlInp = document.getElementById(urlInputId);
+                        if (urlInp) urlInp.value = e.target.result;
+                    }
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // Player Registration Submitter
+        function handlePlayerSubmit(event) {
+            event.preventDefault();
+            const name = document.getElementById('reg-name').value.trim();
+            const position = document.getElementById('reg-position').value;
+            const number = parseInt(document.getElementById('reg-number').value);
+            const height = document.getElementById('reg-height').value.trim() || '1.80m';
+            const phone = document.getElementById('reg-phone').value.trim() || 'N/A';
+            const photoUrl = document.getElementById('reg-photo-url').value.trim() || 'https://placehold.co/300x300/1e293b/f97316?text=' + encodeURIComponent(name);
+
+            if (!name) return;
+
+            // Duplicate validation
+            if (players.some(p => p.number === number)) {
+                alert(`El jersey #${number} ya pertenece a otro jugador.`);
+                return;
+            }
+
+            const newPlayer = { id: 'p_' + Date.now(), name, position, number, height, phone, photo: photoUrl };
+            players.push(newPlayer);
+            activePlayerId = newPlayer.id;
+
+            saveState();
+            updateActiveUserBadge();
+            renderRoster();
+            renderRatingsTable();
+            populateTacticalSelects();
+
+            document.getElementById('form-register-player').reset();
+            alert(`¡Bienvenido a One Coin, ${name}!`);
+            switchTab('roster');
+        }
+
+        // Roster Filtering & Cards
+        function filterPosition(pos) {
+            currentPosFilter = pos;
+            document.querySelectorAll('.pos-filter-btn').forEach(btn => {
+                if (btn.textContent.includes(pos) || (pos === 'All' && btn.textContent === 'Todos')) {
+                    btn.className = 'pos-filter-btn px-3 py-1.5 rounded-lg bg-orange-600 text-white font-bold text-xs shadow-md';
+                } else {
+                    btn.className = 'pos-filter-btn px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 border border-slate-700 text-xs hover:border-slate-500';
+                }
+            });
+            renderRoster();
+        }
+
+        function renderRoster() {
+            const grid = document.getElementById('roster-grid');
+            const countBadge = document.getElementById('player-count-badge');
+            if (!grid) return;
+            grid.innerHTML = '';
+
+            const filtered = currentPosFilter === 'All' ? players : players.filter(p => p.position === currentPosFilter);
+            if (countBadge) countBadge.textContent = players.length;
+
+            if (filtered.length === 0) {
+                grid.innerHTML = '<div class="col-span-full text-center text-slate-500 py-8 text-sm">No hay jugadores registrados aún. Invita a tus compañeros desde el botón superior.</div>';
+                return;
+            }
+
+            filtered.forEach(p => {
+                const stats = getAccumulatedPlayerStats(p.id);
+                const card = document.createElement('div');
+                card.className = "glass-panel p-4 rounded-2xl border border-slate-800 flex flex-col justify-between space-y-4 hover:border-orange-500/50 transition shadow-lg";
+                card.innerHTML = `
+                    <div class="flex items-start space-x-3">
+                        <img src="${p.photo}" onerror="this.src='https://placehold.co/100x100/1e293b/f97316?text=Foto'" class="w-16 h-16 rounded-2xl object-cover border border-slate-700 shadow-md">
+                        <div class="flex-grow">
+                            <div class="flex items-center justify-between">
+                                <span class="bg-orange-500/20 text-orange-400 font-black text-xs px-2 py-0.5 rounded border border-orange-500/30">#${p.number}</span>
+                                <span class="text-xs text-slate-400 font-semibold">${p.position}</span>
+                            </div>
+                            <h3 class="font-bold text-white text-base mt-1 line-clamp-1">${p.name}</h3>
+                            <p class="text-xs text-slate-400">📏 ${p.height}</p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-1 bg-slate-900/60 p-2 rounded-xl text-center text-[10px] border border-slate-800/80">
+                        <div>
+                            <span class="text-slate-500 block uppercase">PPP</span>
+                            <span class="font-bold text-slate-200">${stats.ppp}</span>
+                        </div>
+                        <div>
+                            <span class="text-slate-500 block uppercase">TPP</span>
+                            <span class="font-bold text-slate-200">${stats.tpp}</span>
+                        </div>
+                        <div>
+                            <span class="text-slate-500 block uppercase">APP</span>
+                            <span class="font-bold text-slate-200">${stats.app}</span>
+                        </div>
+                    </div>
+
+                    <button onclick="openPlayerCardModal('${p.id}')" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs py-2 rounded-xl font-bold border border-slate-700 transition flex items-center justify-center gap-1.5">
+                        <i class="fa-solid fa-id-card text-orange-400"></i> Ver Tarjeta
+                    </button>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // Stats Computation Helper
+        function getAccumulatedPlayerStats(playerId) {
+            let matchesPlayed = 0, pts = 0, blk = 0, ast = 0;
+            matches.forEach(m => {
+                if (m.finished && m.playerStats && m.playerStats[playerId]) {
+                    matchesPlayed++;
+                    pts += parseInt(m.playerStats[playerId].pts || 0);
+                    blk += parseInt(m.playerStats[playerId].blk || 0);
+                    ast += parseInt(m.playerStats[playerId].ast || 0);
+                }
+            });
+            return {
+                matchesPlayed,
+                pts, blk, ast,
+                ppp: matchesPlayed > 0 ? (pts / matchesPlayed).toFixed(1) : "0.0",
+                tpp: matchesPlayed > 0 ? (blk / matchesPlayed).toFixed(1) : "0.0",
+                app: matchesPlayed > 0 ? (ast / matchesPlayed).toFixed(1) : "0.0"
+            };
+        }
+
+        // Player Collectible Card Modal
+        function openPlayerCardModal(playerId) {
+            const p = players.find(x => x.id === playerId);
+            if (!p) return;
+            const stats = getAccumulatedPlayerStats(playerId);
+
+            document.getElementById('card-photo').src = p.photo;
+            document.getElementById('card-number').textContent = `#${p.number}`;
+            document.getElementById('card-name').textContent = p.name;
+            document.getElementById('card-position').textContent = p.position;
+            document.getElementById('card-height').textContent = `Estatura: ${p.height}`;
+            document.getElementById('card-ppp').textContent = stats.ppp;
+            document.getElementById('card-tpp').textContent = stats.tpp;
+            document.getElementById('card-app').textContent = stats.app;
+            document.getElementById('card-pj').textContent = stats.matchesPlayed;
+
+            document.getElementById('card-modal').classList.remove('hidden');
+        }
+
+        function closeCardModal() {
+            document.getElementById('card-modal').classList.add('hidden');
+        }
+
+        // Matches Render & RSVP Management
+        function openMatchModal() { document.getElementById('match-modal').classList.remove('hidden'); }
+        function closeMatchModal() { document.getElementById('match-modal').classList.add('hidden'); }
+
+        function handleCreateMatch(e) {
+            e.preventDefault();
+            const opponent = document.getElementById('match-opponent').value;
+            const date = document.getElementById('match-date').value;
+            const time = document.getElementById('match-time').value;
+            const location = document.getElementById('match-location').value;
+
+            const newMatch = {
+                id: 'm_' + Date.now(),
+                opponent, date, time, location,
+                rsvp: {}, finished: false, result: null, scoreTeam: 0, scoreOpponent: 0, playerStats: {}
+            };
+            matches.push(newMatch);
+            saveState();
+            renderMatches();
+            closeMatchModal();
+        }
+
+        function renderMatches() {
+            const container = document.getElementById('matches-list');
+            if (!container) return;
+            container.innerHTML = '';
+
+            if (matches.length === 0) {
+                container.innerHTML = '<div class="text-center text-slate-500 py-8">No hay partidos programados. ¡Agrega uno con el botón superior!</div>';
+                return;
+            }
+
+            matches.forEach(m => {
+                const card = document.createElement('div');
+                card.className = "glass-panel p-5 rounded-2xl border border-slate-800 space-y-4 shadow-xl";
+                
+                let rsvpRows = players.length === 0 ? '<p class="text-xs text-slate-500">Registra jugadores para gestionar asistencias.</p>' : players.map(p => {
+                    const status = m.rsvp[p.id] || 'Pendiente';
+                    return `
+                        <div class="flex items-center justify-between text-xs py-1 border-b border-slate-800/40">
+                            <span class="text-slate-300 font-bold">${p.name} (#${p.number})</span>
+                            <select onchange="updateRSVP('${m.id}', '${p.id}', this.value)" class="bg-slate-900 border border-slate-700 text-slate-200 text-xs rounded-lg p-1">
+                                <option value="Pendiente" ${status==='Pendiente'?'selected':''}>Pendiente</option>
+                                <option value="Iría" ${status==='Iría'?'selected':''}>Asistiré</option>
+                                <option value="Duda" ${status==='Duda'?'selected':''}>Duda</option>
+                                <option value="No iría" ${status==='No iría'?'selected':''}>No asistiré</option>
+                            </select>
+                        </div>
+                    `;
+                }).join('');
+
+                card.innerHTML = `
+                    <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-2 border-b border-slate-800 pb-3">
+                        <div>
+                            <span class="text-orange-400 font-extrabold text-xs uppercase">VS ${m.opponent}</span>
+                            <h3 class="text-white font-black text-lg">📍 ${m.location}</h3>
+                        </div>
+                        <div class="text-right text-xs text-slate-400">
+                            <p>📅 ${m.date} | ⏰ ${m.time} hrs</p>
+                        </div>
+                    </div>
+                    <div>
+                        <h4 class="text-xs font-bold text-slate-400 uppercase mb-2">Confirmación de Asistencia</h4>
+                        <div class="space-y-1">${rsvpRows}</div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function updateRSVP(matchId, playerId, status) {
+            const m = matches.find(x => x.id === matchId);
+            if (m) {
+                m.rsvp[playerId] = status;
+                saveState();
+            }
+        }
+
+        // Ratings Table Renderer
+        function renderRatingsTable() {
+            const tbody = document.getElementById('ratings-table-body');
+            if (!tbody) return;
+            tbody.innerHTML = '';
+
+            if (players.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="11" class="p-4 text-center text-slate-500">No hay jugadores registrados para mostrar valoraciones.</td></tr>';
+                return;
+            }
+
+            players.forEach(p => {
+                const stats = getAccumulatedPlayerStats(p.id);
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-800/40 transition border-b border-slate-800/40";
+                tr.innerHTML = `
+                    <td class="p-3 font-bold text-white flex items-center gap-2">
+                        <img src="${p.photo}" onerror="this.src='https://placehold.co/100x100/1e293b/f97316?text=Foto'" class="w-7 h-7 rounded-full object-cover border border-slate-700">
+                        <span>${p.name} <span class="text-orange-400 text-xs">#${p.number}</span></span>
+                    </td>
+                    <td class="p-3 text-center text-slate-300 font-semibold">${p.position}</td>
+                    <td class="p-3 text-center font-bold text-slate-200">${stats.matchesPlayed}</td>
+                    <td class="p-3 text-center"><span class="font-bold text-white">${stats.pts}</span> <span class="text-slate-400 text-[10px]">(${stats.ppp})</span></td>
+                    <td class="p-3 text-center"><span class="font-bold text-white">${stats.blk}</span> <span class="text-slate-400 text-[10px]">(${stats.tpp})</span></td>
+                    <td class="p-3 text-center"><span class="font-bold text-white">${stats.ast}</span> <span class="text-slate-400 text-[10px]">(${stats.app})</span></td>
+                    <td class="p-3 text-center text-amber-400 font-bold">0.0</td>
+                    <td class="p-3 text-center text-amber-400 font-bold">0.0</td>
+                    <td class="p-3 text-center text-amber-400 font-bold">0.0</td>
+                    <td class="p-3 text-center text-amber-400 font-bold">0.0</td>
+                    <td class="p-3 text-center text-emerald-400 font-black">0.0 ⭐</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Tactical 2-3 Selects Helper
+        function populateTacticalSelects() {
+            ['ala1', 'centro', 'ala2', 'poste1', 'poste2'].forEach(slot => {
+                const select = document.getElementById(`select-${slot}`);
+                if (!select) return;
+                select.innerHTML = '<option value="">-- Seleccionar --</option>';
+                players.forEach(p => {
+                    select.innerHTML += `<option value="${p.id}" ${startingFive[slot] === p.id ? 'selected' : ''}>#${p.number} ${p.name}</option>`;
+                });
+            });
+        }
+
+        function saveStartingFive() {
+            startingFive = {
+                ala1: document.getElementById('select-ala1').value,
+                centro: document.getElementById('select-centro').value,
+                ala2: document.getElementById('select-ala2').value,
+                poste1: document.getElementById('select-poste1').value,
+                poste2: document.getElementById('select-poste2').value,
+            };
+            saveState();
+            alert('¡Quinteto titular (2-3) guardado exitosamente!');
+        }
+
+        // Active Player User Badge Helper
+        function updateActiveUserBadge() {
+            const activePlayer = players.find(p => p.id === activePlayerId) || players[0];
+            const badge = document.getElementById('active-user-badge');
+            if (activePlayer && badge) {
+                const avatar = document.getElementById('active-user-avatar');
+                const name = document.getElementById('active-user-name');
+                if (avatar) avatar.src = activePlayer.photo;
+                if (name) name.textContent = activePlayer.name;
+                badge.classList.remove('hidden');
+            } else if (badge) {
+                badge.classList.add('hidden');
+            }
+        }
+
+        // Season Summary Metrics Banner
+        function renderSeasonBanner() {
+            let wins = 0, losses = 0;
+            matches.forEach(m => {
+                if (m.finished) {
+                    if (m.result === 'Ganado') wins++;
+                    else if (m.result === 'Perdido') losses++;
+                }
+            });
+
+            const rec = document.getElementById('stat-record');
+            const strk = document.getElementById('stat-streak');
+            if (rec) rec.textContent = `${wins}V - ${losses}D`;
+            if (strk) strk.textContent = wins > 0 ? `🔥 +${wins} Vict` : '--';
+
+            let topScorer = { name: '--', pts: 0 };
+            players.forEach(p => {
+                const s = getAccumulatedPlayerStats(p.id);
+                if (s.pts > topScorer.pts) topScorer = { name: p.name, pts: s.pts };
+            });
+            const topElem = document.getElementById('stat-top-scorer');
+            if (topElem) topElem.textContent = topScorer.pts > 0 ? `${topScorer.name} (${topScorer.pts} pts)` : '--';
+        }
+
+        // Init App On Window Load
+        function initApp() {
+            try {
+                const storedP = localStorage.getItem('onecoin_players_v5');
+                players = storedP ? JSON.parse(storedP) : [];
+
+                const storedM = localStorage.getItem('onecoin_matches_v5');
+                matches = storedM ? JSON.parse(storedM) : [];
+
+                const storedF = localStorage.getItem('onecoin_starting_five_v5');
+                startingFive = storedF ? JSON.parse(storedF) : { ala1: '', centro: '', ala2: '', poste1: '', poste2: '' };
+
+                activePlayerId = localStorage.getItem('onecoin_active_player_id') || (players.length > 0 ? players[0].id : null);
+            } catch (e) {
+                players = [];
+                matches = [];
+            }
+
+            saveState();
+            updateActiveUserBadge();
+            renderSeasonBanner();
+            renderRoster();
+            renderMatches();
+            renderRatingsTable();
+            populateTacticalSelects();
+            checkInviteLinkAndDirect();
+        }
+
+        window.onload = initApp;
+    </script>
+</body>
+</html>
