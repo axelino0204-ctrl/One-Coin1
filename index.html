@@ -360,4 +360,73 @@
                     <label class="block text-xs font-bold text-slate-300 uppercase mb-1">Lugar / Cancha *</label>
                     <input type="text" id="match-location" required placeholder="ej. Cancha Municipal #2" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white focus:border-orange-500 outline-none">
                 </div>
-                <button type="submit" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-extrabold text-xs py-3 rounded-xl shadow-lg shadow-orange-500/20
+                <button type="submit" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-extrabold text-xs py-3 rounded-xl shadow-lg shadow-orange-500/20 transition">
+                    Guardar Partido
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div id="card-modal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-gradient-to-b from-slate-900 to-slate-950 border-2 border-orange-500/60 rounded-3xl p-6 max-w-sm w-full shadow-2xl relative text-center space-y-4">
+            <button onclick="closeCardModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-lg"><i class="fa-solid fa-xmark"></i></button>
+            <div class="relative inline-block mt-2">
+                <img id="card-photo" src="" class="w-28 h-28 rounded-full object-cover border-4 border-orange-500 mx-auto shadow-2xl">
+                <span id="card-number" class="absolute -bottom-2 right-0 bg-orange-500 text-white font-black text-sm px-2.5 py-0.5 rounded-full shadow-md">#0</span>
+            </div>
+            <div>
+                <h3 id="card-name" class="text-xl font-black text-white">Nombre</h3>
+                <p id="card-position" class="text-xs text-orange-400 font-bold uppercase">Posición</p>
+                <p id="card-height" class="text-[11px] text-slate-400">Estatura</p>
+            </div>
+            <div class="grid grid-cols-3 gap-2 bg-slate-900/80 p-3 rounded-2xl border border-slate-800 text-center text-xs">
+                <div>
+                    <span class="text-slate-500 block text-[10px] uppercase font-bold">PPP</span>
+                    <span id="card-ppp" class="font-black text-white text-sm">0.0</span>
+                </div>
+                <div>
+                    <span class="text-slate-500 block text-[10px] uppercase font-bold">TPP</span>
+                    <span id="card-tpp" class="font-black text-white text-sm">0.0</span>
+                </div>
+                <div>
+                    <span class="text-slate-500 block text-[10px] uppercase font-bold">APP</span>
+                    <span id="card-app" class="font-black text-white text-sm">0.0</span>
+                </div>
+            </div>
+            <div class="bg-slate-900/60 p-3 rounded-2xl border border-slate-800 text-left text-xs space-y-1">
+                <div class="flex justify-between">
+                    <span class="text-slate-400">Promedio General:</span>
+                    <span id="card-rating" class="text-amber-400 font-bold">0.0 ⭐</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-slate-400">Partidos Jugados:</span>
+                    <span id="card-pj" class="text-white font-bold">0</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN SCRIPT -->
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyBSN_GRCcgWGgWFwxkvDXQJs5Kl19oBGb4",
+            authDomain: "one-coin-basketball.firebaseapp.com",
+            databaseURL: "https://one-coin-basketball-default-rtdb.firebaseio.com",
+            projectId: "one-coin-basketball",
+            storageBucket: "one-coin-basketball.firebasestorage.app",
+            messagingSenderId: "589947730366",
+            appId: "1:589947730366:web:1855f80682af673035a1ef"
+        };
+
+        let db = null;
+        try {
+            firebase.initializeApp(firebaseConfig);
+            db = firebase.database();
+            db.ref('.info/connected').on('value', (snap) => {
+                const statusBadge = document.getElementById('syncStatus');
+                if (!statusBadge) return;
+                if (snap.val() === true) {
+                    statusBadge.className = "flex items-center gap-1.5 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2.5 py-1 rounded-full text-xs font-bold";
+                    statusBadge.innerHTML = '<i class="fa-solid fa-cloud-check text-emerald-400"></i><span>En tiempo real</span>';
+                } else {
+                    statusBadge.className = "flex items-center gap-1.5 bg-amber-500/10 text-amber-400 border border-amber-500/2
