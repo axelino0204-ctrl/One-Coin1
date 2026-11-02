@@ -91,12 +91,12 @@
                 </div>
 
                 <!-- Botón de Iniciar Sesión / Cerrar Sesión -->
-                <button type="button" id="btn-auth" class="bg-slate-800 hover:bg-slate-700 text-orange-400 border border-orange-500/40 font-extrabold text-xs px-3.5 py-2 rounded-xl shadow-lg flex items-center gap-2 transition active:scale-95">
+                <button type="button" id="btn-auth" class="bg-slate-800 hover:bg-slate-700 text-orange-400 border border-orange-500/40 font-extrabold text-xs px-3.5 py-2 rounded-xl shadow-lg flex items-center gap-2 transition active:scale-95 cursor-pointer">
                     <i class="fa-solid fa-key"></i> <span id="btn-auth-text">Soy Jugador</span>
                 </button>
 
                 <!-- EXCLUSIVO DE JUGADORES: Botón de Invitar -->
-                <button type="button" id="btn-invite-top" class="player-only bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-extrabold text-xs px-3.5 py-2 rounded-xl shadow-lg shadow-orange-500/20 flex items-center gap-2 transition active:scale-95">
+                <button type="button" id="btn-invite-top" class="player-only bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-extrabold text-xs px-3.5 py-2 rounded-xl shadow-lg shadow-orange-500/20 flex items-center gap-2 transition active:scale-95 cursor-pointer">
                     <i class="fa-solid fa-user-plus"></i> <span class="hidden md:inline">Invitar Jugadores</span>
                 </button>
             </div>
@@ -104,19 +104,19 @@
 
         <!-- NAVIGATION TABS -->
         <nav class="flex border-t border-slate-800/80 max-w-7xl mx-auto px-4 overflow-x-auto scrollbar-none text-xs font-bold">
-            <button type="button" data-target="roster" id="tab-roster" class="tab-btn px-4 py-3 text-orange-400 border-b-2 border-orange-500 flex items-center gap-2 whitespace-nowrap transition-colors">
+            <button type="button" data-target="roster" id="tab-roster" class="tab-btn px-4 py-3 text-orange-400 border-b-2 border-orange-500 flex items-center gap-2 whitespace-nowrap transition-colors cursor-pointer">
                 <i class="fa-solid fa-users"></i> Plantilla (Roster)
             </button>
-            <button type="button" data-target="matches" id="tab-matches" class="tab-btn px-4 py-3 text-slate-400 hover:text-slate-200 flex items-center gap-2 whitespace-nowrap transition-colors">
+            <button type="button" data-target="matches" id="tab-matches" class="tab-btn px-4 py-3 text-slate-400 hover:text-slate-200 flex items-center gap-2 whitespace-nowrap transition-colors cursor-pointer">
                 <i class="fa-solid fa-calendar-days"></i> Partidos & Asistencia
             </button>
-            <button type="button" data-target="ratings" id="tab-ratings" class="tab-btn px-4 py-3 text-slate-400 hover:text-slate-200 flex items-center gap-2 whitespace-nowrap transition-colors">
+            <button type="button" data-target="ratings" id="tab-ratings" class="tab-btn px-4 py-3 text-slate-400 hover:text-slate-200 flex items-center gap-2 whitespace-nowrap transition-colors cursor-pointer">
                 <i class="fa-solid fa-star"></i> Valoraciones & Stats (1-10)
             </button>
-            <button type="button" data-target="tactics" id="tab-tactics" class="tab-btn px-4 py-3 text-slate-400 hover:text-slate-200 flex items-center gap-2 whitespace-nowrap transition-colors">
+            <button type="button" data-target="tactics" id="tab-tactics" class="tab-btn px-4 py-3 text-slate-400 hover:text-slate-200 flex items-center gap-2 whitespace-nowrap transition-colors cursor-pointer">
                 <i class="fa-solid fa-chess-board"></i> Pizarra Táctica (2-3)
             </button>
-            <button type="button" data-target="register" id="tab-register" class="player-only tab-btn px-4 py-3 text-slate-400 hover:text-slate-200 flex items-center gap-2 whitespace-nowrap transition-colors">
+            <button type="button" data-target="register" id="tab-register" class="player-only tab-btn px-4 py-3 text-slate-400 hover:text-slate-200 flex items-center gap-2 whitespace-nowrap transition-colors cursor-pointer">
                 <i class="fa-solid fa-user-plus"></i> Registro
             </button>
         </nav>
@@ -158,10 +158,10 @@
                     <p class="text-xs text-slate-400">Filtrar por posición táctica (Poste, Centro, Ala)</p>
                 </div>
                 <div class="flex flex-wrap gap-1.5" id="filter-container">
-                    <button type="button" data-pos="All" class="pos-filter-btn px-3 py-1.5 rounded-lg bg-orange-600 text-white font-bold text-xs shadow-md">Todos</button>
-                    <button type="button" data-pos="Centro" class="pos-filter-btn px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 border border-slate-700 text-xs hover:border-slate-500">Centro</button>
-                    <button type="button" data-pos="Ala" class="pos-filter-btn px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 border border-slate-700 text-xs hover:border-slate-500">Ala</button>
-                    <button type="button" data-pos="Poste" class="pos-filter-btn px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 border border-slate-700 text-xs hover:border-slate-500">Poste</button>
+                    <button type="button" data-pos="All" class="pos-filter-btn px-3 py-1.5 rounded-lg bg-orange-600 text-white font-bold text-xs shadow-md cursor-pointer">Todos</button>
+                    <button type="button" data-pos="Centro" class="pos-filter-btn px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 border border-slate-700 text-xs hover:border-slate-500 cursor-pointer">Centro</button>
+                    <button type="button" data-pos="Ala" class="pos-filter-btn px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 border border-slate-700 text-xs hover:border-slate-500 cursor-pointer">Ala</button>
+                    <button type="button" data-pos="Poste" class="pos-filter-btn px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 border border-slate-700 text-xs hover:border-slate-500 cursor-pointer">Poste</button>
                 </div>
             </div>
             <div id="roster-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"></div>
@@ -174,7 +174,7 @@
                     <h2 class="text-lg font-black text-white">Calendario de Partidos</h2>
                     <p class="text-xs text-slate-400">Votación de asistencia y fechas del equipo</p>
                 </div>
-                <button type="button" id="btn-open-match-modal" class="player-only bg-orange-500 hover:bg-orange-600 text-white font-bold text-xs px-4 py-2 rounded-xl flex items-center gap-2 shadow-lg shadow-orange-500/20">
+                <button type="button" id="btn-open-match-modal" class="player-only bg-orange-500 hover:bg-orange-600 text-white font-bold text-xs px-4 py-2 rounded-xl flex items-center gap-2 shadow-lg shadow-orange-500/20 cursor-pointer">
                     <i class="fa-solid fa-plus"></i> Programar Partido
                 </button>
             </div>
@@ -216,7 +216,7 @@
                     <h2 class="text-lg font-black text-white">Formación Táctica 2-3 (Quinteto Titular)</h2>
                     <p class="text-xs text-slate-400">3 Perímetro (Centro y 2 Alas) + 2 Pintura (Postes)</p>
                 </div>
-                <button type="button" id="btn-save-tactics" class="player-only bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs px-4 py-2 rounded-xl shadow-lg shadow-emerald-600/20">
+                <button type="button" id="btn-save-tactics" class="player-only bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs px-4 py-2 rounded-xl shadow-lg shadow-emerald-600/20 cursor-pointer">
                     <i class="fa-solid fa-floppy-disk"></i> Guardar Quinteto
                 </button>
             </div>
@@ -233,19 +233,3 @@
                             <img id="img-tactic-ala1" src="https://placehold.co/100x100/1e293b/f97316?text=Ala+1" class="w-16 h-16 rounded-full object-cover border-2 border-orange-500 shadow-xl mx-auto">
                             <span id="badge-tactic-ala1" class="absolute -bottom-1 -right-1 bg-orange-500 text-white font-black text-[10px] px-1.5 py-0.5 rounded-full shadow">#--</span>
                         </div>
-                        <select id="select-ala1" class="bg-slate-900 text-slate-200 text-xs font-bold p-2 rounded-xl border border-slate-700 w-full max-w-[160px] text-center shadow-lg focus:border-orange-500 outline-none"></select>
-                    </div>
-
-                    <!-- CENTRO -->
-                    <div class="flex flex-col items-center">
-                        <span class="text-[10px] font-extrabold text-amber-400 bg-slate-900/90 px-2 py-0.5 rounded border border-amber-500/30 uppercase mb-2">Centro / Base</span>
-                        <div class="relative group mb-2">
-                            <img id="img-tactic-centro" src="https://placehold.co/100x100/1e293b/f97316?text=Centro" class="w-16 h-16 rounded-full object-cover border-2 border-amber-500 shadow-xl mx-auto">
-                            <span id="badge-tactic-centro" class="absolute -bottom-1 -right-1 bg-amber-500 text-white font-black text-[10px] px-1.5 py-0.5 rounded-full shadow">#--</span>
-                        </div>
-                        <select id="select-centro" class="bg-slate-900 text-slate-200 text-xs font-bold p-2 rounded-xl border border-slate-700 w-full max-w-[160px] text-center shadow-lg focus:border-orange-500 outline-none"></select>
-                    </div>
-
-                    <!-- ALA 2 -->
-                    <div class="flex flex-col items-center">
-                        <span class="text-[10px] font-extrabold text-orange-400 bg-slate-900/90 px-2 py-0.5 rounded border border-orange-5
