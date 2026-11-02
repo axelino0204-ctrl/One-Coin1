@@ -429,4 +429,424 @@
                     statusBadge.className = "flex items-center gap-1.5 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2.5 py-1 rounded-full text-xs font-bold";
                     statusBadge.innerHTML = '<i class="fa-solid fa-cloud-check text-emerald-400"></i><span>En tiempo real</span>';
                 } else {
-                    statusBadge.className = "flex items-center gap-1.5 bg-amber-500/10 text-amber-400 border border-amber-500/2
+                    statusBadge.className = "flex items-center gap-1.5 bg-amber-500/10 text-amber-400 border border-amber-500/20 px-2.5 py-1 rounded-full text-xs font-bold";
+                    statusBadge.innerHTML = '<i class="fa-solid fa-cloud-arrow-up animate-pulse"></i><span>Conectando...</span>';
+                }
+            });
+        } catch (e) {
+            console.error(e);
+        }
+
+        let players = [];
+        let matches = [];
+        let startingFive = { ala1: '', centro: '', ala2: '', poste1: '', poste2: '' };
+        let activePlayerId = null;
+        let currentPosFilter = 'All';
+
+        function saveState() {
+            if (!db) return;
+            db.ref('onecoin_data').set({ players, matches, startingFive });
+        }
+
+        function initRealtimeSync() {
+            if (!db) return;
+            // Usamos 'once' en lugar de 'on' para sincronizar al entrar sin bloquear el cambio de pestañas
+            db.ref('onecoin_data').once('value').then((snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    players = data.players || [];
+                    matches = data.matches || [];
+                    startingFive = data.startingFive || { ala1: '', centro: '', ala2: '', poste1: '', poste2: '' };
+                    if (!activePlayerId && players.length > 0) activePlayerId = players[0].id;
+                    renderAllViews();
+                }
+            });
+
+            // Escuchar cambios posteriores en segundo plano de manera segura
+            db.ref('onecoin_data').on('child_changed', (snapshot) => {
+                db.ref('onecoin_data').once('value').then((snap) => {
+                    const data = snap.val();
+                    if (data) {
+                        players = data.players || [];
+                        matches = data.matches || [];
+                        startingFive = data.startingFive || { ala1: '', centro: '', ala2: '', poste1: '', poste2: '' };
+                        renderAllViews();
+                    }
+                });
+            });
+        }
+
+        function renderAllViews() {
+            updateActiveUserBadge();
+            renderSeasonBanner();
+            renderRoster();
+            renderMatches();
+            renderRatingsTable();
+            populateTacticalSelects();
+        }
+
+        // CONTROL DE PESTAÑAS 100% LIBRE DE BLOQUEOS
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.className = 'tab-btn px-4 py-3 text-slate-400 hover:text-slate-200 flex items-center gap-2 whitespace-nowrap transition-colors';
+            });
+
+            const activeView = document.getElementById(`view-${tabId}`);
+            const activeTabBtn = document.getElementById(`tab-${tabId}`);
+            
+            if (activeView) activeView.classList.remove('hidden');
+            if (activeTabBtn) {
+                activeTabBtn.className = 'tab-btn px-4 py-3 text-orange-400 border-b-2 border-orange-500 flex items-center gap-2 whitespace-nowrap transition-colors';
+            }
+        }
+
+        function openInviteModal() {
+            const modal = document.getElementById('invite-modal');
+            const input = document.getElementById('invite-url-input');
+            if (modal && input) {
+                input.value = getInviteUrl();
+                modal.classList.remove('hidden');
+            }
+        }
+
+        function closeInviteModal() {
+            document.getElementById('invite-modal').classList.add('hidden');
+        }
+
+        function getInviteUrl() {
+            let base = window.location.href.split('#')[0].split('?')[0];
+            return `${base}?invite=true#register`;
+        }
+
+        function copyInviteLink() {
+            const input = document.getElementById('invite-url-input');
+            if (!input) return;
+            input.select();
+            document.execCommand('copy');
+            alert('¡Enlace de invitación copiado!');
+        }
+
+        function shareWhatsAppInvite() {
+            const url = getInviteUrl();
+            const text = encodeURIComponent(`🏀 ¡Únete al equipo oficial de One Coin Basketball! Registra tu ficha de jugador aquí:\n${url}`);
+            window.open(`https://api.whatsapp.com/send?text=${text}`, '_blank');
+        }
+
+        function checkInviteLinkAndDirect() {
+            const href = String(window.location.href).toLowerCase();
+            if (href.includes('invite') || href.includes('register')) {
+                switchTab('register');
+                const banner = document.getElementById('invite-banner');
+                if (banner) banner.classList.remove('hidden');
+            }
+        }
+
+        function handleImageUpload(event, previewId, urlInputId) {
+            const file = event.target.files && event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const prev = document.getElementById(previewId);
+                    if (prev) prev.src = e.target.result;
+                    if (urlInputId) document.getElementById(urlInputId).value = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function handlePlayerSubmit(event) {
+            event.preventDefault();
+            const name = document.getElementById('reg-name').value.trim();
+            const position = document.getElementById('reg-position').value;
+            const number = parseInt(document.getElementById('reg-number').value);
+            const height = document.getElementById('reg-height').value.trim() || '1.80m';
+            const phone = document.getElementById('reg-phone').value.trim() || 'N/A';
+            const photoUrl = document.getElementById('reg-photo-url').value.trim() || 'https://placehold.co/300x300/1e293b/f97316?text=' + encodeURIComponent(name);
+
+            if (players.some(p => p.number === number)) {
+                alert(`El jersey #${number} ya pertenece a otro jugador.`);
+                return;
+            }
+
+            const newPlayer = { id: 'p_' + Date.now(), name, position, number, height, phone, photo: photoUrl };
+            players.push(newPlayer);
+            activePlayerId = newPlayer.id;
+
+            saveState();
+            document.getElementById('form-register-player').reset();
+            alert(`¡Bienvenido a One Coin, ${name}!`);
+            switchTab('roster');
+        }
+
+        function filterPosition(pos) {
+            currentPosFilter = pos;
+            document.querySelectorAll('.pos-filter-btn').forEach(btn => {
+                if (btn.textContent.includes(pos) || (pos === 'All' && btn.textContent === 'Todos')) {
+                    btn.className = 'pos-filter-btn px-3 py-1.5 rounded-lg bg-orange-600 text-white font-bold text-xs shadow-md';
+                } else {
+                    btn.className = 'pos-filter-btn px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 border border-slate-700 text-xs hover:border-slate-500';
+                }
+            });
+            renderRoster();
+        }
+
+        function renderRoster() {
+            const grid = document.getElementById('roster-grid');
+            const countBadge = document.getElementById('player-count-badge');
+            if (!grid) return;
+            grid.innerHTML = '';
+
+            const filtered = currentPosFilter === 'All' ? players : players.filter(p => p.position === currentPosFilter);
+            if (countBadge) countBadge.textContent = players.length;
+
+            if (filtered.length === 0) {
+                grid.innerHTML = '<div class="col-span-full text-center text-slate-500 py-8 text-sm">No hay jugadores registrados aún. Invita a tus compañeros desde el botón superior.</div>';
+                return;
+            }
+
+            filtered.forEach(p => {
+                const stats = getAccumulatedPlayerStats(p.id);
+                const card = document.createElement('div');
+                card.className = "glass-panel p-4 rounded-2xl border border-slate-800 flex flex-col justify-between space-y-4 hover:border-orange-500/50 transition shadow-lg";
+                card.innerHTML = `
+                    <div class="flex items-start space-x-3">
+                        <img src="${p.photo}" onerror="this.src='https://placehold.co/100x100/1e293b/f97316?text=Foto'" class="w-16 h-16 rounded-2xl object-cover border border-slate-700 shadow-md">
+                        <div class="flex-grow">
+                            <div class="flex items-center justify-between">
+                                <span class="bg-orange-500/20 text-orange-400 font-black text-xs px-2 py-0.5 rounded border border-orange-500/30">#${p.number}</span>
+                                <span class="text-xs text-slate-400 font-semibold">${p.position}</span>
+                            </div>
+                            <h3 class="font-bold text-white text-base mt-1 line-clamp-1">${p.name}</h3>
+                            <p class="text-xs text-slate-400">📏 ${p.height}</p>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-3 gap-1 bg-slate-900/60 p-2 rounded-xl text-center text-[10px] border border-slate-800/80">
+                        <div><span class="text-slate-500 block uppercase">PPP</span><span class="font-bold text-slate-200">${stats.ppp}</span></div>
+                        <div><span class="text-slate-500 block uppercase">TPP</span><span class="font-bold text-slate-200">${stats.tpp}</span></div>
+                        <div><span class="text-slate-500 block uppercase">APP</span><span class="font-bold text-slate-200">${stats.app}</span></div>
+                    </div>
+                    <button onclick="openPlayerCardModal('${p.id}')" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs py-2 rounded-xl font-bold border border-slate-700 transition flex items-center justify-center gap-1.5">
+                        <i class="fa-solid fa-id-card text-orange-400"></i> Ver Tarjeta
+                    </button>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function getAccumulatedPlayerStats(playerId) {
+            let matchesPlayed = 0, pts = 0, blk = 0, ast = 0;
+            matches.forEach(m => {
+                if (m.finished && m.playerStats && m.playerStats[playerId]) {
+                    matchesPlayed++;
+                    pts += parseInt(m.playerStats[playerId].pts || 0);
+                    blk += parseInt(m.playerStats[playerId].blk || 0);
+                    ast += parseInt(m.playerStats[playerId].ast || 0);
+                }
+            });
+            return {
+                matchesPlayed, pts, blk, ast,
+                ppp: matchesPlayed > 0 ? (pts / matchesPlayed).toFixed(1) : "0.0",
+                tpp: matchesPlayed > 0 ? (blk / matchesPlayed).toFixed(1) : "0.0",
+                app: matchesPlayed > 0 ? (ast / matchesPlayed).toFixed(1) : "0.0"
+            };
+        }
+
+        function openPlayerCardModal(playerId) {
+            const p = players.find(x => x.id === playerId);
+            if (!p) return;
+            const stats = getAccumulatedPlayerStats(playerId);
+            document.getElementById('card-photo').src = p.photo;
+            document.getElementById('card-number').textContent = `#${p.number}`;
+            document.getElementById('card-name').textContent = p.name;
+            document.getElementById('card-position').textContent = p.position;
+            document.getElementById('card-height').textContent = `Estatura: ${p.height}`;
+            document.getElementById('card-ppp').textContent = stats.ppp;
+            document.getElementById('card-tpp').textContent = stats.tpp;
+            document.getElementById('card-app').textContent = stats.app;
+            document.getElementById('card-pj').textContent = stats.matchesPlayed;
+            document.getElementById('card-modal').classList.remove('hidden');
+        }
+
+        function closeCardModal() {
+            document.getElementById('card-modal').classList.add('hidden');
+        }
+
+        function openMatchModal() { document.getElementById('match-modal').classList.remove('hidden'); }
+        function closeMatchModal() { document.getElementById('match-modal').classList.add('hidden'); }
+
+        function handleCreateMatch(e) {
+            e.preventDefault();
+            const opponent = document.getElementById('match-opponent').value;
+            const date = document.getElementById('match-date').value;
+            const time = document.getElementById('match-time').value;
+            const location = document.getElementById('match-location').value;
+
+            const newMatch = {
+                id: 'm_' + Date.now(),
+                opponent, date, time, location,
+                rsvp: {}, finished: false, result: null, scoreTeam: 0, scoreOpponent: 0, playerStats: {}
+            };
+            matches.push(newMatch);
+            saveState();
+            closeMatchModal();
+        }
+
+        function renderMatches() {
+            const container = document.getElementById('matches-list');
+            if (!container) return;
+            container.innerHTML = '';
+
+            if (matches.length === 0) {
+                container.innerHTML = '<div class="text-center text-slate-500 py-8">No hay partidos programados. ¡Agrega uno con el botón superior!</div>';
+                return;
+            }
+
+            matches.forEach(m => {
+                const card = document.createElement('div');
+                card.className = "glass-panel p-5 rounded-2xl border border-slate-800 space-y-4 shadow-xl";
+                
+                let rsvpRows = players.length === 0 ? '<p class="text-xs text-slate-500">Registra jugadores para gestionar asistencias.</p>' : players.map(p => {
+                    const status = (m.rsvp && m.rsvp[p.id]) || 'Pendiente';
+                    return `
+                        <div class="flex items-center justify-between text-xs py-1 border-b border-slate-800/40">
+                            <span class="text-slate-300 font-bold">${p.name} (#${p.number})</span>
+                            <select onchange="updateRSVP('${m.id}', '${p.id}', this.value)" class="bg-slate-900 border border-slate-700 text-slate-200 text-xs rounded-lg p-1">
+                                <option value="Pendiente" ${status==='Pendiente'?'selected':''}>Pendiente</option>
+                                <option value="Iría" ${status==='Iría'?'selected':''}>Asistiré</option>
+                                <option value="Duda" ${status==='Duda'?'selected':''}>Duda</option>
+                                <option value="No iría" ${status==='No iría'?'selected':''}>No asistiré</option>
+                            </select>
+                        </div>
+                    `;
+                }).join('');
+
+                card.innerHTML = `
+                    <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-2 border-b border-slate-800 pb-3">
+                        <div>
+                            <span class="text-orange-400 font-extrabold text-xs uppercase">VS ${m.opponent}</span>
+                            <h3 class="text-white font-black text-lg">📍 ${m.location}</h3>
+                        </div>
+                        <div class="text-right text-xs text-slate-400">
+                            <p>📅 ${m.date} | ⏰ ${m.time} hrs</p>
+                        </div>
+                    </div>
+                    <div>
+                        <h4 class="text-xs font-bold text-slate-400 uppercase mb-2">Confirmación de Asistencia</h4>
+                        <div class="space-y-1">${rsvpRows}</div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function updateRSVP(matchId, playerId, status) {
+            const m = matches.find(x => x.id === matchId);
+            if (m) {
+                if (!m.rsvp) m.rsvp = {};
+                m.rsvp[playerId] = status;
+                saveState();
+            }
+        }
+
+        function renderRatingsTable() {
+            const tbody = document.getElementById('ratings-table-body');
+            if (!tbody) return;
+            tbody.innerHTML = '';
+
+            if (players.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="11" class="p-4 text-center text-slate-500">No hay jugadores registrados para mostrar valoraciones.</td></tr>';
+                return;
+            }
+
+            players.forEach(p => {
+                const stats = getAccumulatedPlayerStats(p.id);
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-800/40 transition border-b border-slate-800/40";
+                tr.innerHTML = `
+                    <td class="p-3 font-bold text-white flex items-center gap-2">
+                        <img src="${p.photo}" onerror="this.src='https://placehold.co/100x100/1e293b/f97316?text=Foto'" class="w-7 h-7 rounded-full object-cover border border-slate-700">
+                        <span>${p.name} <span class="text-orange-400 text-xs">#${p.number}</span></span>
+                    </td>
+                    <td class="p-3 text-center text-slate-300 font-semibold">${p.position}</td>
+                    <td class="p-3 text-center font-bold text-slate-200">${stats.matchesPlayed}</td>
+                    <td class="p-3 text-center"><span class="font-bold text-white">${stats.pts}</span> <span class="text-slate-400 text-[10px]">(${stats.ppp})</span></td>
+                    <td class="p-3 text-center"><span class="font-bold text-white">${stats.blk}</span> <span class="text-slate-400 text-[10px]">(${stats.tpp})</span></td>
+                    <td class="p-3 text-center"><span class="font-bold text-white">${stats.ast}</span> <span class="text-slate-400 text-[10px]">(${stats.app})</span></td>
+                    <td class="p-3 text-center text-amber-400 font-bold">0.0</td>
+                    <td class="p-3 text-center text-amber-400 font-bold">0.0</td>
+                    <td class="p-3 text-center text-amber-400 font-bold">0.0</td>
+                    <td class="p-3 text-center text-amber-400 font-bold">0.0</td>
+                    <td class="p-3 text-center text-emerald-400 font-black">0.0 ⭐</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function populateTacticalSelects() {
+            ['ala1', 'centro', 'ala2', 'poste1', 'poste2'].forEach(slot => {
+                const select = document.getElementById(`select-${slot}`);
+                if (!select) return;
+                select.innerHTML = '<option value="">-- Seleccionar --</option>';
+                players.forEach(p => {
+                    select.innerHTML += `<option value="${p.id}" ${startingFive && startingFive[slot] === p.id ? 'selected' : ''}>#${p.number} ${p.name}</option>`;
+                });
+            });
+        }
+
+        function saveStartingFive() {
+            startingFive = {
+                ala1: document.getElementById('select-ala1').value,
+                centro: document.getElementById('select-centro').value,
+                ala2: document.getElementById('select-ala2').value,
+                poste1: document.getElementById('select-poste1').value,
+                poste2: document.getElementById('select-poste2').value,
+            };
+            saveState();
+            alert('¡Quinteto titular (2-3) guardado exitosamente!');
+        }
+
+        function updateActiveUserBadge() {
+            const activePlayer = players.find(p => p.id === activePlayerId) || players[0];
+            const badge = document.getElementById('active-user-badge');
+            if (activePlayer && badge) {
+                const avatar = document.getElementById('active-user-avatar');
+                const name = document.getElementById('active-user-name');
+                if (avatar) avatar.src = activePlayer.photo;
+                if (name) name.textContent = activePlayer.name;
+                badge.classList.remove('hidden');
+            } else if (badge) {
+                badge.classList.add('hidden');
+            }
+        }
+
+        function renderSeasonBanner() {
+            let wins = 0, losses = 0;
+            matches.forEach(m => {
+                if (m.finished) {
+                    if (m.result === 'Ganado') wins++;
+                    else if (m.result === 'Perdido') losses++;
+                }
+            });
+
+            const rec = document.getElementById('stat-record');
+            const strk = document.getElementById('stat-streak');
+            if (rec) rec.textContent = `${wins}V - ${losses}D`;
+            if (strk) strk.textContent = wins > 0 ? `🔥 +${wins} Vict` : '--';
+
+            let topScorer = { name: '--', pts: 0 };
+            players.forEach(p => {
+                const s = getAccumulatedPlayerStats(p.id);
+                if (s.pts > topScorer.pts) topScorer = { name: p.name, pts: s.pts };
+            });
+            const topElem = document.getElementById('stat-top-scorer');
+            if (topElem) topElem.textContent = topScorer.pts > 0 ? `${topScorer.name} (${topScorer.pts} pts)` : '--';
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initRealtimeSync();
+            checkInviteLinkAndDirect();
+        });
+    </script>
+</body>
+</html>
